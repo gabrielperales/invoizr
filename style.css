@@ -1,0 +1,192 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', 'sans-serif';
+}
+
+.bc-transparent {
+  background-color: transparent;
+}
+
+.c-white {
+  color: white;
+}
+
+.d-block {
+  display: block;
+}
+
+.d-inline-block {
+  display: inline-block;
+}
+
+.ta-center {
+  text-align: center;
+}
+
+.ta-right {
+  text-align: right;
+}
+
+.ta-left {
+  text-align: left;
+}
+
+.ta-justify {
+  text-align: justify;
+}
+
+.b-none {
+  border: none;
+}
+
+.b-b-1px {
+  border-bottom: 1px solid;
+}
+
+.fs-0-6em {
+  font-size: .6em;
+}
+
+.fs-0-8em {
+  font-size: .8em;
+}
+
+.fs-1em {
+  font-size: 1em;
+}
+
+.fs-1-5em {
+  font-size: 1.5em;
+}
+
+.fs-2em {
+  font-size: 2em;
+}
+
+.fs-3em {
+  font-size: 3em;
+}
+
+.p-0 {
+  padding: 0;
+}
+
+.p-1em {
+  padding: 1em;
+}
+
+.p-b-1em {
+  padding-bottom: 1em;
+}
+
+.p-lr-1em {
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+.p-lr-3em {
+  padding-left: 3em;
+  padding-right: 3em;
+}
+
+.p-tb-1-5em {
+  padding-top: 1.5em;
+  padding-bottom: 1.5em;
+}
+
+.m-0 {
+  margin: 0;
+}
+
+.m-1em {
+  margin: 1em;
+}
+
+.m-b-2em {
+  margin-bottom: 2em;
+}
+
+.m-tb-0-75em {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+.m-tb-1em {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.m-lr-3em {
+  margin-left: 3em;
+  margin-right: 3em;
+}
+
+.wrapper {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.header {
+  background-color: #84BD00;
+  color: white;
+}
+
+.total {
+  color: #84BD00;
+}
+
+.footer {
+  background-color: #84BD00;
+  color: white;
+  display: block;
+  height: 100px;
+}
+
+.row {
+  overflow: overlay;
+  clear: both;
+}
+
+[class*="col-"] {
+  float: left;
+}
+
+.col-3 {
+  display: inline-block;
+  width: 25%;
+}
+
+.col-4 {
+  display: inline-block;
+  width: 33.3%;
+}
+
+.col-12 {
+  display: inline-block;
+  width: 100%;
+}
+
+@media print {
+  body {
+    -webkit-print-color-adjust: exact;
+  }
+
+  .no-print {
+    display: none;
+  }
+
+  .header {
+    background-color: #84BD00 !important;
+    color: #FFFFFF !important;
+  }
+
+  .footer {
+    background-color: #84BD00 !important;
+    color: #FFFFFF !important;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+}
