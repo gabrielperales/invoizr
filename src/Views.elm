@@ -41,7 +41,7 @@ invoiceHeader : Language -> ContactDetails -> Html Msg
 invoiceHeader language { name, taxes_id, phone, email, website, address } =
     let
         inputText classes val =
-            input [ class ("d-block bc-transparent b-none c-white p" ++ classes), type_ "text", value val ] []
+            input [ class ("d-block bc-transparent b-none c-white p " ++ classes), type_ "text", value val ] []
 
         inputDefault =
             inputText "m-1em"
