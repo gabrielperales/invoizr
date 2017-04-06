@@ -11,6 +11,7 @@ import Material.Menu as Menu
 import Material.Button as Button
 import Material.Textfield as Textfield
 import Material.Options as Options
+import Helpers exposing (toFixed)
 
 
 toolbar : Material.Model -> Html Msg
@@ -37,13 +38,13 @@ invoiceHeader : ContactDetails -> Html Msg
 invoiceHeader { name, taxes_id, phone, email, website, address } =
     let
         inputText classes val =
-            input [ class ("d-block bc-transparent b-none c-white fs-0-8em " ++ classes), type_ "text", value val ] []
+            input [ class ("d-block bc-transparent b-none c-white p" ++ classes), type_ "text", value val ] []
 
         inputDefault =
             inputText "m-1em"
 
         inputBigger =
-            inputText "fs-1em m-0 m-tb-0-75em p-0 ta-left"
+            inputText "h4 m-0 m-tb-0-75em p-0 ta-left"
     in
         header [ class "row header p-tb-1-5em p-lr-3em" ]
             [ div [ class "col-4" ]
@@ -67,7 +68,7 @@ contactInfoView : ContactDetails -> Html Msg
 contactInfoView { name, taxes_id, address } =
     let
         inputText val =
-            input [ class "b-none fs-1em", type_ "text", value val ] []
+            input [ class "b-none h4", type_ "text", value val ] []
     in
         div []
             [ p []
@@ -189,7 +190,7 @@ addLineView line =
             [ label [ class "col-4" ]
                 [ text "Service name: "
                 , input
-                    [ class "col-12 b-none b-b-1px fs-1em ta-right"
+                    [ class "col-12 b-none b-b-1px h4 ta-right"
                     , type_ "text"
                     , name "productName"
                     , placeholder "Product Name"
@@ -201,7 +202,7 @@ addLineView line =
             , label [ class "col-4" ]
                 [ text "Service price (€): "
                 , input
-                    [ class "col-12 b-none b-b-1px fs-1em ta-right"
+                    [ class "col-12 b-none b-b-1px h4 ta-right"
                     , type_ "number"
                     , name "productPrice"
                     , placeholder "Price"
@@ -213,7 +214,7 @@ addLineView line =
             , label [ class "col-4" ]
                 [ text "Quantity: "
                 , input
-                    [ class "col-12 b-none b-b-1px fs-1em ta-right"
+                    [ class "col-12 b-none b-b-1px h4 ta-right"
                     , type_ "number"
                     , name "productQty"
                     , placeholder "Quantity"
@@ -260,7 +261,7 @@ invoiceView { invoicer, customer, invoice, currentLine, currency, mdl } =
             currencySymb currency
 
         inputText val =
-            input [ class "b-none col-12 d-block fs-1em m-tb-1em", type_ "text", value val ] []
+            input [ class "b-none col-12 d-block h4 m-tb-1em", type_ "text", value val ] []
     in
         div [ class "wrapper" ]
             [ toolbar mdl
@@ -279,27 +280,27 @@ invoiceView { invoicer, customer, invoice, currentLine, currency, mdl } =
                         ]
                     , div [ class "col-4" ]
                         [ p [ class "ta-right" ] [ text "Invoice total" ]
-                        , h1 [ class "ta-right fs-3em total" ] [ text <| toString (total invoice) ++ symbol ]
+                        , h1 [ class "ta-right h1 total" ] [ text <| toFixed 2 (total invoice) ++ symbol ]
                         ]
                     ]
                 , hr [ class "m-lr-3em b-none b-b-1px" ] []
                 , div [ class "p-lr-3em p-b-1em" ]
-                    [ p [ class "fs-1-5em" ] [ text "PROJECT BREAKDOWN" ]
+                    [ p [ class "h3" ] [ text "PROJECT BREAKDOWN" ]
                     , invoiceLinesView mdl invoice
                     ]
                 , div [ class "p-lr-3em p-b-1em no-print" ]
                     [ addLineView currentLine
                     ]
-                , p [ class "p-lr-3em ta-right" ] [ text <| "Subtotal: " ++ toString (subtotal invoice) ++ symbol ]
-                , p [ class "p-lr-3em ta-right" ] [ text <| "Taxes: " ++ toString (taxes invoice) ++ symbol ]
-                , p [ class "p-lr-3em ta-right" ] [ strong [] [ text <| "Total: " ++ toString (total invoice) ++ symbol ] ]
+                , p [ class "p-lr-3em ta-right" ] [ text <| "Subtotal: " ++ toFixed 2 (subtotal invoice) ++ symbol ]
+                , p [ class "p-lr-3em ta-right" ] [ text <| "Taxes: " ++ toFixed 2 (taxes invoice) ++ symbol ]
+                , p [ class "p-lr-3em ta-right" ] [ strong [] [ text <| "Total: " ++ toFixed 2 (total invoice) ++ symbol ] ]
                 , footer [ class "footer p-1em p-lr-3em" ]
-                    [ p [ class "fs-0-8em ta-justify" ]
+                    [ p [ class "p ta-justify" ]
                         [ text
                             """IMPORTANT: The above invoice may be paid by Bank Transfer.
                       Payment is due within 30 days from the date of this invoice, late payment is subject to a fee of 5% per month"""
                         ]
-                    , p [ class "ta-center fs-0-6em" ] [ text "Gabriel Perales ® 2017" ]
+                    , p [ class "ta-center h6" ] [ text "Gabriel Perales ® 2017" ]
                     ]
                 ]
             ]

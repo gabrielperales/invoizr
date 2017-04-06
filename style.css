@@ -44,27 +44,27 @@ html, body {
   border-bottom: 1px solid;
 }
 
-.fs-0-6em {
+.h6 {
   font-size: .6em;
 }
 
-.fs-0-8em {
+.h5, .p {
   font-size: .8em;
 }
 
-.fs-1em {
+.h4 {
   font-size: 1em;
 }
 
-.fs-1-5em {
+.h3 {
   font-size: 1.5em;
 }
 
-.fs-2em {
+.h2 {
   font-size: 2em;
 }
 
-.fs-3em {
+.h1 {
   font-size: 3em;
 }
 
