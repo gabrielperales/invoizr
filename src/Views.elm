@@ -3,7 +3,7 @@ module Views exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (type_, name, placeholder, value, action, id, class, style)
 import Html.Events exposing (onSubmit, onInput, onClick, onDoubleClick)
-import Types exposing (..)
+import Types exposing (ContactDetails, InvoiceLines, Line, Msg(..), Model)
 import InvoiceHelpers exposing (currencySymb, subtotal, taxes, total)
 import Date
 import Material
@@ -12,30 +12,33 @@ import Material.Button as Button
 import Material.Textfield as Textfield
 import Material.Options as Options
 import Helpers exposing (toFixed)
+import I18n exposing (translate, TranslationId(..), Language(..))
 
 
-toolbar : Material.Model -> Html Msg
-toolbar mdl =
+toolbar : Language -> Material.Model -> Html Msg
+toolbar language mdl =
     div [ class "no-print m-tb-1em" ]
         [ Menu.render Mdl
             [ 0 ]
             mdl
             [ Menu.ripple, Menu.bottomLeft ]
             [ Menu.item
-                []
-                [ text "English" ]
+                [ Menu.onSelect <| SetLanguage EN ]
+                [ text <| translate language English ]
             , Menu.item
-                [ Menu.divider ]
-                [ text "Spanish" ]
+                [ Menu.divider
+                , Menu.onSelect <| SetLanguage ES
+                ]
+                [ text <| translate language Spanish ]
             , Menu.item
                 [ Menu.onSelect SavePDF ]
-                [ text "Print" ]
+                [ text <| translate language Print ]
             ]
         ]
 
 
-invoiceHeader : ContactDetails -> Html Msg
-invoiceHeader { name, taxes_id, phone, email, website, address } =
+invoiceHeader : Language -> ContactDetails -> Html Msg
+invoiceHeader language { name, taxes_id, phone, email, website, address } =
     let
         inputText classes val =
             input [ class ("d-block bc-transparent b-none c-white p" ++ classes), type_ "text", value val ] []
@@ -49,7 +52,7 @@ invoiceHeader { name, taxes_id, phone, email, website, address } =
         header [ class "row header p-tb-1-5em p-lr-3em" ]
             [ div [ class "col-4" ]
                 [ inputBigger name
-                , h1 [] [ text "INVOICE" ]
+                , h1 [] [ text <| translate language Invoice ]
                 ]
             , div [ class "col-4 ta-right" ]
                 [ inputDefault phone
@@ -64,22 +67,22 @@ invoiceHeader { name, taxes_id, phone, email, website, address } =
             ]
 
 
-contactInfoView : ContactDetails -> Html Msg
-contactInfoView { name, taxes_id, address } =
+contactInfoView : Language -> ContactDetails -> Html Msg
+contactInfoView language { name, taxes_id, address } =
     let
         inputText val =
             input [ class "b-none h4", type_ "text", value val ] []
     in
         div []
             [ p []
-                [ text <| "Name: "
+                [ text <| (translate language Name) ++ " :"
                 , inputText name
                 ]
             , p []
-                [ text <| "Tax id: "
+                [ text <| (translate language TaxId) ++ ": "
                 , inputText taxes_id
                 ]
-            , p [] [ text <| "Address: " ]
+            , p [] [ text <| (translate language Address) ++ ": " ]
             , div [ class "p-lr-1em" ]
                 ([ address.street, address.city, address.zip ]
                     |> List.map inputText
@@ -103,8 +106,8 @@ lineView ( index, { product, quantity } ) =
             ]
 
 
-editLineView : Material.Model -> ( Int, Line ) -> Html Msg
-editLineView mdl ( index, line ) =
+editLineView : Language -> Material.Model -> ( Int, Line ) -> Html Msg
+editLineView language mdl ( index, line ) =
     let
         { product, quantity } =
             line
@@ -146,7 +149,7 @@ editLineView mdl ( index, line ) =
                     , Button.colored
                     , Options.onClick <| ToggleEditLine index
                     ]
-                    [ text "save" ]
+                    [ text <| translate language Save ]
                 , Button.render Mdl
                     [ 0 ]
                     mdl
@@ -154,13 +157,13 @@ editLineView mdl ( index, line ) =
                     , Button.colored
                     , Options.onClick <| DeleteLine index
                     ]
-                    [ text "delete" ]
+                    [ text <| translate language Delete ]
                 ]
             ]
 
 
-addLineView : Line -> Html Msg
-addLineView line =
+addLineView : Language -> Line -> Html Msg
+addLineView language line =
     let
         { product } =
             line
@@ -188,7 +191,7 @@ addLineView line =
     in
         form [ class "row", action "javascript:void(0);", onSubmit <| AddLine line ]
             [ label [ class "col-4" ]
-                [ text "Service name: "
+                [ text <| (translate language ServiceName) ++ ": "
                 , input
                     [ class "col-12 b-none b-b-1px h4 ta-right"
                     , type_ "text"
@@ -200,7 +203,7 @@ addLineView line =
                     []
                 ]
             , label [ class "col-4" ]
-                [ text "Service price (€): "
+                [ text <| (translate language Price) ++ " (€): "
                 , input
                     [ class "col-12 b-none b-b-1px h4 ta-right"
                     , type_ "number"
@@ -212,7 +215,7 @@ addLineView line =
                     []
                 ]
             , label [ class "col-4" ]
-                [ text "Quantity: "
+                [ text <| (translate language Quantity) ++ ": "
                 , input
                     [ class "col-12 b-none b-b-1px h4 ta-right"
                     , type_ "number"
@@ -227,21 +230,21 @@ addLineView line =
             ]
 
 
-invoiceLinesView : Material.Model -> InvoiceLines -> Html Msg
-invoiceLinesView mdl invoiceLines =
+invoiceLinesView : Language -> Material.Model -> InvoiceLines -> Html Msg
+invoiceLinesView language mdl invoiceLines =
     let
         tableHead =
             tr [ class "row col-12" ]
-                [ th [ class "col-3 p-0 ta-right" ] [ text "Product name" ]
-                , th [ class "col-3 p-0 ta-right" ] [ text "Price" ]
-                , th [ class "col-3 p-0 ta-right" ] [ text "Taxes" ]
-                , th [ class "col-3 p-0 ta-right" ] [ text "Quantity" ]
+                [ th [ class "col-3 p-0 ta-right" ] [ text <| translate language ServiceName ]
+                , th [ class "col-3 p-0 ta-right" ] [ text <| translate language Price ]
+                , th [ class "col-3 p-0 ta-right" ] [ text <| translate language Taxes ]
+                , th [ class "col-3 p-0 ta-right" ] [ text <| translate language Quantity ]
                 , th [] []
                 ]
 
         view index line =
             if line.editing then
-                editLineView mdl ( index, line )
+                editLineView language mdl ( index, line )
             else
                 lineView ( index, line )
 
@@ -255,7 +258,7 @@ invoiceLinesView mdl invoiceLines =
 
 
 invoiceView : Model -> Html Msg
-invoiceView { invoicer, customer, invoice, currentLine, currency, mdl } =
+invoiceView { invoicer, customer, invoice, currentLine, currency, language, mdl } =
     let
         symbol =
             currencySymb currency
@@ -264,36 +267,36 @@ invoiceView { invoicer, customer, invoice, currentLine, currency, mdl } =
             input [ class "b-none col-12 d-block h4 m-tb-1em", type_ "text", value val ] []
     in
         div [ class "wrapper" ]
-            [ toolbar mdl
+            [ toolbar language mdl
             , div [ id "invoice" ]
-                [ invoiceHeader invoicer
+                [ invoiceHeader language invoicer
                 , div [ class "row p-lr-3em p-tb-1-5em" ]
                     [ div [ class "col-4" ]
-                        [ strong [] [ text "Billed to:" ]
-                        , contactInfoView customer
+                        [ strong [] [ text <| (translate language BilledTo) ++ ": " ]
+                        , contactInfoView language customer
                         ]
                     , div [ class "col-4" ]
-                        [ strong [] [ text "Invoice Number" ]
+                        [ strong [] [ text <| (translate language InvoiceNumber) ++ ": " ]
                         , inputText "#000001"
-                        , p [] [ strong [] [ text "Date Of Issue" ] ]
+                        , p [] [ strong [] [ text <| (translate language DateOfIssue) ++ ": " ] ]
                         , inputText "01/01/2017"
                         ]
                     , div [ class "col-4" ]
-                        [ p [ class "ta-right" ] [ text "Invoice total" ]
+                        [ p [ class "ta-right" ] [ text <| (translate language InvoiceTotal) ++ ": " ]
                         , h1 [ class "ta-right h1 total" ] [ text <| toFixed 2 (total invoice) ++ symbol ]
                         ]
                     ]
                 , hr [ class "m-lr-3em b-none b-b-1px" ] []
                 , div [ class "p-lr-3em p-b-1em" ]
-                    [ p [ class "h3" ] [ text "PROJECT BREAKDOWN" ]
-                    , invoiceLinesView mdl invoice
+                    [ p [ class "h3" ] [ text <| translate language ProjectBreakdown ]
+                    , invoiceLinesView language mdl invoice
                     ]
                 , div [ class "p-lr-3em p-b-1em no-print" ]
-                    [ addLineView currentLine
+                    [ addLineView language currentLine
                     ]
-                , p [ class "p-lr-3em ta-right" ] [ text <| "Subtotal: " ++ toFixed 2 (subtotal invoice) ++ symbol ]
-                , p [ class "p-lr-3em ta-right" ] [ text <| "Taxes: " ++ toFixed 2 (taxes invoice) ++ symbol ]
-                , p [ class "p-lr-3em ta-right" ] [ strong [] [ text <| "Total: " ++ toFixed 2 (total invoice) ++ symbol ] ]
+                , p [ class "p-lr-3em ta-right" ] [ text <| (translate language Subtotal) ++ ": " ++ toFixed 2 (subtotal invoice) ++ symbol ]
+                , p [ class "p-lr-3em ta-right" ] [ text <| (translate language Taxes) ++ ": " ++ toFixed 2 (taxes invoice) ++ symbol ]
+                , p [ class "p-lr-3em ta-right" ] [ strong [] [ text <| (translate language Total) ++ ": " ++ toFixed 2 (total invoice) ++ symbol ] ]
                 , footer [ class "footer p-1em p-lr-3em" ]
                     [ p [ class "p ta-justify" ]
                         [ text

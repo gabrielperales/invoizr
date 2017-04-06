@@ -1,6 +1,7 @@
 module Types exposing (..)
 
 import Material
+import I18n exposing (Language)
 
 
 type alias Model =
@@ -9,6 +10,7 @@ type alias Model =
     , invoice : Invoice
     , currentLine : Line
     , currency : Currency
+    , language : Language
     , mdl : Material.Model
     }
 
@@ -70,5 +72,6 @@ type Msg
     | ToggleEditLine Int
     | DeleteLine Int
     | UpdateCurrentLine Line
+    | SetLanguage Language
     | SavePDF
     | Mdl (Material.Msg Msg)

@@ -6,6 +6,7 @@ import Views exposing (invoiceView)
 import InvoiceHelpers exposing (newContact, newEmptyLine)
 import Material
 import Ports exposing (..)
+import I18n exposing (Language(..))
 
 
 model : Model
@@ -15,6 +16,7 @@ model =
     , invoice = []
     , currentLine = newEmptyLine
     , currency = EUR
+    , language = EN
     , mdl = Material.model
     }
 
@@ -57,6 +59,9 @@ update msg model =
                         Just item
             in
                 { model | invoice = List.filterMap filter <| List.indexedMap (,) model.invoice } ! [ Cmd.none ]
+
+        SetLanguage language ->
+            { model | language = language } ! [ Cmd.none ]
 
         SavePDF ->
             model ! [ downloadPdf () ]
