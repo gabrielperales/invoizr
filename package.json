@@ -7,7 +7,7 @@
   },
   "scripts": {
     "test": "elm-test",
-    "start": "elm-live src/App.elm --output=elm.js --open --pushstate"
+    "start": "elm-live src/App.elm --output=elm.js --open --pushstate --debug"
   },
   "author": "Gabriel Perales",
   "license": "ISC",

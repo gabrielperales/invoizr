@@ -13,6 +13,10 @@ type alias Model =
     }
 
 
+type alias Flags =
+    { invoicerjson : String }
+
+
 type Currency
     = EUR
     | USD
@@ -70,5 +74,7 @@ type Msg
     | ToggleEditLine Int
     | DeleteLine Int
     | UpdateCurrentLine Line
+    | UpdateInvoicer ContactDetails
     | SetLanguage Language
+    | SetCurrency Currency
     | PrintPort

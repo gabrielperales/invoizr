@@ -3,7 +3,7 @@ module Views exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (type_, name, placeholder, value, action, id, class, style)
 import Html.Events exposing (onSubmit, onInput, onClick, onDoubleClick)
-import Types exposing (ContactDetails, InvoiceLines, Line, Msg(..), Model)
+import Types exposing (ContactDetails, InvoiceLines, Line, Msg(..), Currency(..), Model)
 import InvoiceHelpers exposing (currencySymb, subtotal, taxes, total)
 import Date
 import Helpers exposing (toFixed)
@@ -17,15 +17,24 @@ toolbar language =
         , text "|"
         , button [ onClick <| SetLanguage ES ] [ text <| translate language Spanish ]
         , text "|"
+        , button [ onClick <| SetCurrency EUR ] [ text "€" ]
+        , text "|"
+        , button [ onClick <| SetCurrency GBP ] [ text "£" ]
+        , text "|"
+        , button [ onClick <| SetCurrency USD ] [ text "$" ]
+        , text "|"
         , button [ onClick PrintPort ] [ text <| translate language Print ]
         ]
 
 
 invoiceHeader : Language -> ContactDetails -> Html Msg
-invoiceHeader language { name, taxes_id, phone, email, website, address } =
+invoiceHeader language invoicer =
     let
-        inputText classes val =
-            input [ class ("d-block bc-transparent b-none c-white p " ++ classes), type_ "text", value val ] []
+        { name, taxes_id, phone, email, website, address } =
+            invoicer
+
+        inputText classes val change =
+            input [ class ("d-block col-12 bc-transparent b-none c-white p " ++ classes), type_ "text", value val, onInput change ] []
 
         inputDefault =
             inputText "m-1em"
@@ -35,18 +44,18 @@ invoiceHeader language { name, taxes_id, phone, email, website, address } =
     in
         header [ class "row header p-tb-1-5em p-lr-3em" ]
             [ div [ class "col-4" ]
-                [ inputBigger name
+                [ inputBigger name <| \value -> UpdateInvoicer { invoicer | name = value }
                 , h1 [] [ text <| translate language Invoice ]
                 ]
             , div [ class "col-4 ta-right" ]
-                [ inputDefault phone
-                , inputDefault email
-                , inputDefault website
+                [ inputDefault phone <| \value -> UpdateInvoicer { invoicer | phone = value }
+                , inputDefault email <| \value -> UpdateInvoicer { invoicer | email = value }
+                , inputDefault website <| \value -> UpdateInvoicer { invoicer | website = value }
                 ]
             , div [ class "col-4 ta-right" ]
-                [ inputDefault address.street
-                , inputDefault address.city
-                , inputDefault address.zip
+                [ inputDefault address.street <| \value -> UpdateInvoicer { invoicer | address = { address | street = value } }
+                , inputDefault address.city <| \value -> UpdateInvoicer { invoicer | address = { address | city = value } }
+                , inputDefault address.zip <| \value -> UpdateInvoicer { invoicer | address = { address | zip = value } }
                 ]
             ]
 
@@ -132,8 +141,8 @@ editLineView language ( index, line ) =
             ]
 
 
-addLineView : Language -> Line -> Html Msg
-addLineView language line =
+addLineView : Language -> Currency -> Line -> Html Msg
+addLineView language currency line =
     let
         { product } =
             line
@@ -173,7 +182,7 @@ addLineView language line =
                     []
                 ]
             , label [ class "col-4" ]
-                [ text <| (translate language Price) ++ " (€): "
+                [ text <| (translate language Price) ++ " (" ++ (currencySymb currency) ++ "): "
                 , input
                     [ class "col-12 b-none b-b-1px h4 ta-right"
                     , type_ "number"
@@ -262,7 +271,7 @@ invoiceView { invoicer, customer, invoice, currentLine, currency, language } =
                     , invoiceLinesView language invoice
                     ]
                 , div [ class "p-lr-3em p-b-1em no-print" ]
-                    [ addLineView language currentLine
+                    [ addLineView language currency currentLine
                     ]
                 , p [ class "p-lr-3em ta-right" ] [ text <| (translate language Subtotal) ++ ": " ++ toFixed 2 (subtotal invoice) ++ symbol ]
                 , p [ class "p-lr-3em ta-right" ] [ text <| (translate language Taxes) ++ ": " ++ toFixed 2 (taxes invoice) ++ symbol ]

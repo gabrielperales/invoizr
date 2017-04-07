@@ -1,11 +1,12 @@
 module App exposing (..)
 
-import Types exposing (Model, Line, Product, Msg(..), Currency(..))
-import Html exposing (program)
+import Types exposing (Model, Flags, Line, Product, Msg(..), Currency(..))
+import Html exposing (programWithFlags)
 import Views exposing (invoiceView)
 import InvoiceHelpers exposing (newContact, newEmptyLine)
 import Ports exposing (..)
 import I18n exposing (Language(..))
+import ContactDetails
 
 
 model : Model
@@ -27,6 +28,9 @@ update msg model =
 
         UpdateCurrentLine line ->
             { model | currentLine = line } ! [ Cmd.none ]
+
+        UpdateInvoicer invoicer ->
+            { model | invoicer = invoicer } ! [ saveInvoicerDetails <| ContactDetails.encode invoicer ]
 
         ToggleEditLine index ->
             let
@@ -61,14 +65,31 @@ update msg model =
         SetLanguage language ->
             { model | language = language } ! [ Cmd.none ]
 
+        SetCurrency currency ->
+            { model | currency = currency } ! [ Cmd.none ]
+
         PrintPort ->
             model ! [ print () ]
 
 
-main : Program Never Model Msg
+init : Flags -> ( Model, Cmd Msg )
+init flags =
+    let
+        { invoicerjson } =
+            flags
+    in
+        case (ContactDetails.decode invoicerjson) of
+            Ok invoicer ->
+                update (UpdateInvoicer invoicer) model
+
+            Err _ ->
+                model ! [ Cmd.none ]
+
+
+main : Program Flags Model Msg
 main =
-    program
-        { init = ( model, Cmd.none )
+    programWithFlags
+        { init = init
         , view = invoiceView
         , subscriptions = always Sub.none
         , update = update
