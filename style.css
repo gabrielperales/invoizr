@@ -178,12 +178,15 @@ html, body {
 
   .header {
     background-color: #84BD00 !important;
-    color: #FFFFFF !important;
+    color: #FFF !important;
   }
 
   .footer {
     background-color: #84BD00 !important;
     color: #FFFFFF !important;
+  }
+
+  .footer {
     position: fixed;
     left: 0;
     right: 0;

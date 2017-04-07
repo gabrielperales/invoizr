@@ -6,34 +6,18 @@ import Html.Events exposing (onSubmit, onInput, onClick, onDoubleClick)
 import Types exposing (ContactDetails, InvoiceLines, Line, Msg(..), Model)
 import InvoiceHelpers exposing (currencySymb, subtotal, taxes, total)
 import Date
-import Material
-import Material.Menu as Menu
-import Material.Button as Button
-import Material.Textfield as Textfield
-import Material.Options as Options
 import Helpers exposing (toFixed)
 import I18n exposing (translate, TranslationId(..), Language(..))
 
 
-toolbar : Language -> Material.Model -> Html Msg
-toolbar language mdl =
+toolbar : Language -> Html Msg
+toolbar language =
     div [ class "no-print m-tb-1em" ]
-        [ Menu.render Mdl
-            [ 0 ]
-            mdl
-            [ Menu.ripple, Menu.bottomLeft ]
-            [ Menu.item
-                [ Menu.onSelect <| SetLanguage EN ]
-                [ text <| translate language English ]
-            , Menu.item
-                [ Menu.divider
-                , Menu.onSelect <| SetLanguage ES
-                ]
-                [ text <| translate language Spanish ]
-            , Menu.item
-                [ Menu.onSelect SavePDF ]
-                [ text <| translate language Print ]
-            ]
+        [ button [ onClick <| SetLanguage EN ] [ text <| translate language English ]
+        , text "|"
+        , button [ onClick <| SetLanguage ES ] [ text <| translate language Spanish ]
+        , text "|"
+        , button [ onClick PrintPort ] [ text <| translate language Print ]
         ]
 
 
@@ -106,8 +90,8 @@ lineView ( index, { product, quantity } ) =
             ]
 
 
-editLineView : Language -> Material.Model -> ( Int, Line ) -> Html Msg
-editLineView language mdl ( index, line ) =
+editLineView : Language -> ( Int, Line ) -> Html Msg
+editLineView language ( index, line ) =
     let
         { product, quantity } =
             line
@@ -142,22 +126,8 @@ editLineView language mdl ( index, line ) =
             , td [ class "col-3 p-0 ta-right" ] [ input [ class "ta-right", type_ "number", value <| toString taxes, onInput <| updateField "taxes" ] [] ]
             , td [ class "col-3 p-0 ta-right" ] [ input [ class "ta-right", type_ "number", value <| toString quantity, onInput <| updateField "quantity" ] [] ]
             , td [ style [ ( "float", "right" ) ] ]
-                [ Button.render Mdl
-                    [ 0 ]
-                    mdl
-                    [ Button.raised
-                    , Button.colored
-                    , Options.onClick <| ToggleEditLine index
-                    ]
-                    [ text <| translate language Save ]
-                , Button.render Mdl
-                    [ 0 ]
-                    mdl
-                    [ Button.raised
-                    , Button.colored
-                    , Options.onClick <| DeleteLine index
-                    ]
-                    [ text <| translate language Delete ]
+                [ button [ onClick <| ToggleEditLine index ] [ text <| translate language Save ]
+                , button [ onClick <| DeleteLine index ] [ text <| translate language Delete ]
                 ]
             ]
 
@@ -230,8 +200,8 @@ addLineView language line =
             ]
 
 
-invoiceLinesView : Language -> Material.Model -> InvoiceLines -> Html Msg
-invoiceLinesView language mdl invoiceLines =
+invoiceLinesView : Language -> InvoiceLines -> Html Msg
+invoiceLinesView language invoiceLines =
     let
         tableHead =
             tr [ class "row col-12" ]
@@ -244,7 +214,7 @@ invoiceLinesView language mdl invoiceLines =
 
         view index line =
             if line.editing then
-                editLineView language mdl ( index, line )
+                editLineView language ( index, line )
             else
                 lineView ( index, line )
 
@@ -258,7 +228,7 @@ invoiceLinesView language mdl invoiceLines =
 
 
 invoiceView : Model -> Html Msg
-invoiceView { invoicer, customer, invoice, currentLine, currency, language, mdl } =
+invoiceView { invoicer, customer, invoice, currentLine, currency, language } =
     let
         symbol =
             currencySymb currency
@@ -267,7 +237,7 @@ invoiceView { invoicer, customer, invoice, currentLine, currency, language, mdl 
             input [ class "b-none col-12 d-block h4 m-tb-1em", type_ "text", value val ] []
     in
         div [ class "wrapper" ]
-            [ toolbar language mdl
+            [ toolbar language
             , div [ id "invoice" ]
                 [ invoiceHeader language invoicer
                 , div [ class "row p-lr-3em p-tb-1-5em" ]
@@ -289,7 +259,7 @@ invoiceView { invoicer, customer, invoice, currentLine, currency, language, mdl 
                 , hr [ class "m-lr-3em b-none b-b-1px" ] []
                 , div [ class "p-lr-3em p-b-1em" ]
                     [ p [ class "h3" ] [ text <| translate language ProjectBreakdown ]
-                    , invoiceLinesView language mdl invoice
+                    , invoiceLinesView language invoice
                     ]
                 , div [ class "p-lr-3em p-b-1em no-print" ]
                     [ addLineView language currentLine

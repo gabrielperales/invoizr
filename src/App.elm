@@ -4,7 +4,6 @@ import Types exposing (Model, Line, Product, Msg(..), Currency(..))
 import Html exposing (program)
 import Views exposing (invoiceView)
 import InvoiceHelpers exposing (newContact, newEmptyLine)
-import Material
 import Ports exposing (..)
 import I18n exposing (Language(..))
 
@@ -17,7 +16,6 @@ model =
     , currentLine = newEmptyLine
     , currency = EUR
     , language = EN
-    , mdl = Material.model
     }
 
 
@@ -63,11 +61,8 @@ update msg model =
         SetLanguage language ->
             { model | language = language } ! [ Cmd.none ]
 
-        SavePDF ->
-            model ! [ downloadPdf () ]
-
-        Mdl msg_ ->
-            Material.update Mdl msg_ model
+        PrintPort ->
+            model ! [ print () ]
 
 
 main : Program Never Model Msg
