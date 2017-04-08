@@ -14,7 +14,7 @@ type alias Model =
 
 
 type alias Flags =
-    { invoicerjson : String }
+    { invoicerjson : Maybe String }
 
 
 type Currency

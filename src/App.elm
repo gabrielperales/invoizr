@@ -77,8 +77,11 @@ init flags =
     let
         { invoicerjson } =
             flags
+
+        invoicerstr =
+            Maybe.withDefault "" invoicerjson
     in
-        case (ContactDetails.decode invoicerjson) of
+        case (ContactDetails.decode invoicerstr) of
             Ok invoicer ->
                 update (UpdateInvoicer invoicer) model
 

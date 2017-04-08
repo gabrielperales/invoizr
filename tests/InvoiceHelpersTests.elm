@@ -20,7 +20,7 @@ dummyInvoiceLines =
 
 all : Test
 all =
-    describe "Sample Test Suite"
+    describe "InvoiceHelpers Test Suite"
         [ describe "Unit test examples"
             [ test "Add new line to the invoice" <|
                 \() ->

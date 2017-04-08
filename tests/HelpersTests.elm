@@ -7,8 +7,8 @@ import Expect
 
 all : Test
 all =
-    describe "Sample Test Suite"
-        [ describe "Unit test examples"
+    describe "Helpers Test Suite"
+        [ describe "toFixed : Int -> Float -> String"
             [ test "toFixed truncating decimals" <|
                 \() ->
                     Expect.equal "1.12" <| toFixed 2 1.12111
