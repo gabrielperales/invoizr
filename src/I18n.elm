@@ -15,6 +15,7 @@ type TranslationId
     | Price
     | Taxes
     | Quantity
+    | Amount
     | Save
     | Delete
     | Subtotal
@@ -72,6 +73,9 @@ translate language id =
 
                 Quantity ->
                     "Quantity"
+
+                Amount ->
+                    "Amount"
 
                 Save ->
                     "Save"
@@ -134,6 +138,9 @@ translate language id =
 
                 Quantity ->
                     "Unidades"
+
+                Amount ->
+                    "Cantidad"
 
                 Save ->
                     "Actualizar"

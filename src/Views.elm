@@ -4,7 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (type_, name, placeholder, value, action, id, class, style)
 import Html.Events exposing (onSubmit, onInput, onClick, onDoubleClick)
 import Types exposing (ContactDetails, InvoiceLines, Line, Msg(..), Currency(..), Model)
-import InvoiceHelpers exposing (currencySymb, subtotal, taxes, total)
+import InvoiceHelpers exposing (currencySymb, toCurrency, subtotalLine, subtotal, taxes, total)
 import Date
 import Helpers exposing (toFixed)
 import I18n exposing (translate, TranslationId(..), Language(..))
@@ -85,17 +85,20 @@ contactInfoView language { name, taxes_id, address } =
 
 
 lineView : ( Int, Line ) -> Html Msg
-lineView ( index, { product, quantity } ) =
+lineView ( index, line ) =
     let
+        { product, quantity } =
+            line
+
         { name, price, taxes } =
             product
     in
         tr [ class "row col-12", onDoubleClick <| ToggleEditLine index ]
             [ td [ class "col-3 p-0 ta-right" ] [ text name ]
             , td [ class "col-3 p-0 ta-right" ] [ text <| toString price ]
-            , td [ class "col-3 p-0 ta-right" ] [ text <| (toString taxes) ++ " %" ]
-            , td [ class "col-3 p-0 ta-right" ] [ text <| toString quantity ]
-            , td [] []
+            , td [ class "col-2 p-0 ta-right" ] [ text <| (toString taxes) ++ " %" ]
+            , td [ class "col-2 p-0 ta-right" ] [ text <| toString quantity ]
+            , td [ class "col-2 p-0 ta-right" ] [ text <| toString <| subtotalLine line ]
             ]
 
 
@@ -130,10 +133,10 @@ editLineView language ( index, line ) =
                         UpdateLine index line
     in
         tr [ class "row col-12" ]
-            [ td [ class "col-3 p-0 ta-right" ] [ input [ class "ta-right", type_ "name", value <| toString name, onInput <| updateField "name" ] [] ]
-            , td [ class "col-3 p-0 ta-right" ] [ input [ class "ta-right", type_ "number", value <| toString price, onInput <| updateField "price" ] [] ]
-            , td [ class "col-3 p-0 ta-right" ] [ input [ class "ta-right", type_ "number", value <| toString taxes, onInput <| updateField "taxes" ] [] ]
-            , td [ class "col-3 p-0 ta-right" ] [ input [ class "ta-right", type_ "number", value <| toString quantity, onInput <| updateField "quantity" ] [] ]
+            [ td [ class "col-3 p-0 ta-right" ] [ input [ class "col-12 ta-right", type_ "name", value <| toString name, onInput <| updateField "name" ] [] ]
+            , td [ class "col-3 p-0 ta-right" ] [ input [ class "col-12 ta-right", type_ "number", value <| toString price, onInput <| updateField "price" ] [] ]
+            , td [ class "col-2 p-0 ta-right" ] [ input [ class "col-12 ta-right", type_ "number", value <| toString taxes, onInput <| updateField "taxes" ] [] ]
+            , td [ class "col-2 p-0 ta-right" ] [ input [ class "col-12 ta-right", type_ "number", value <| toString quantity, onInput <| updateField "quantity" ] [] ]
             , td [ style [ ( "float", "right" ) ] ]
                 [ button [ onClick <| ToggleEditLine index ] [ text <| translate language Save ]
                 , button [ onClick <| DeleteLine index ] [ text <| translate language Delete ]
@@ -175,7 +178,7 @@ addLineView language currency line =
                     [ class "col-12 b-none b-b-1px h4 ta-right"
                     , type_ "text"
                     , name "productName"
-                    , placeholder "Product Name"
+                    , placeholder (translate language ServiceName)
                     , value line.product.name
                     , onInput <| updateField "name"
                     ]
@@ -187,7 +190,7 @@ addLineView language currency line =
                     [ class "col-12 b-none b-b-1px h4 ta-right"
                     , type_ "number"
                     , name "productPrice"
-                    , placeholder "Price"
+                    , placeholder (translate language Price)
                     , value <| toString line.product.price
                     , onInput <| updateField "price"
                     ]
@@ -199,7 +202,7 @@ addLineView language currency line =
                     [ class "col-12 b-none b-b-1px h4 ta-right"
                     , type_ "number"
                     , name "productQty"
-                    , placeholder "Quantity"
+                    , placeholder (translate language Quantity)
                     , value <| toString quantity
                     , onInput <| updateField "quantity"
                     ]
@@ -216,9 +219,9 @@ invoiceLinesView language invoiceLines =
             tr [ class "row col-12" ]
                 [ th [ class "col-3 p-0 ta-right" ] [ text <| translate language ServiceName ]
                 , th [ class "col-3 p-0 ta-right" ] [ text <| translate language Price ]
-                , th [ class "col-3 p-0 ta-right" ] [ text <| translate language Taxes ]
-                , th [ class "col-3 p-0 ta-right" ] [ text <| translate language Quantity ]
-                , th [] []
+                , th [ class "col-2 p-0 ta-right" ] [ text <| translate language Taxes ]
+                , th [ class "col-2 p-0 ta-right" ] [ text <| translate language Quantity ]
+                , th [ class "col-2 p-0 ta-right" ] [ text <| translate language Amount ]
                 ]
 
         view index line =
@@ -239,9 +242,6 @@ invoiceLinesView language invoiceLines =
 invoiceView : Model -> Html Msg
 invoiceView { invoicer, customer, invoice, currentLine, currency, language } =
     let
-        symbol =
-            currencySymb currency
-
         inputText val =
             input [ class "b-none col-12 d-block h4 m-tb-1em", type_ "text", value val ] []
     in
@@ -262,7 +262,7 @@ invoiceView { invoicer, customer, invoice, currentLine, currency, language } =
                         ]
                     , div [ class "col-4" ]
                         [ p [ class "ta-right" ] [ text <| (translate language InvoiceTotal) ++ ": " ]
-                        , h1 [ class "ta-right h1 total" ] [ text <| toFixed 2 (total invoice) ++ symbol ]
+                        , h1 [ class "ta-right h1 total" ] [ text <| toCurrency ( currency, total invoice ) ]
                         ]
                     ]
                 , hr [ class "m-lr-3em b-none b-b-1px" ] []
@@ -273,9 +273,9 @@ invoiceView { invoicer, customer, invoice, currentLine, currency, language } =
                 , div [ class "p-lr-3em p-b-1em no-print" ]
                     [ addLineView language currency currentLine
                     ]
-                , p [ class "p-lr-3em ta-right" ] [ text <| (translate language Subtotal) ++ ": " ++ toFixed 2 (subtotal invoice) ++ symbol ]
-                , p [ class "p-lr-3em ta-right" ] [ text <| (translate language Taxes) ++ ": " ++ toFixed 2 (taxes invoice) ++ symbol ]
-                , p [ class "p-lr-3em ta-right" ] [ strong [] [ text <| (translate language Total) ++ ": " ++ toFixed 2 (total invoice) ++ symbol ] ]
+                , p [ class "p-lr-3em ta-right" ] [ text <| (translate language Subtotal) ++ ": " ++ toCurrency ( currency, subtotal invoice ) ]
+                , p [ class "p-lr-3em ta-right" ] [ text <| (translate language Taxes) ++ ": " ++ toCurrency ( currency, taxes invoice ) ]
+                , p [ class "p-lr-3em ta-right" ] [ strong [] [ text <| (translate language Total) ++ ": " ++ toCurrency ( currency, total invoice ) ] ]
                 , footer [ class "footer p-1em p-lr-3em" ]
                     [ p [ class "p ta-justify" ]
                         [ text

@@ -150,20 +150,26 @@ html, body {
 
 [class*="col-"] {
   float: left;
+  display: inline-block;
+}
+
+.col-1 {
+  width: 8.33%;
+}
+
+.col-2 {
+  width: 16.66%;
 }
 
 .col-3 {
-  display: inline-block;
   width: 25%;
 }
 
 .col-4 {
-  display: inline-block;
-  width: 33.3%;
+  width: 33.33%;
 }
 
 .col-12 {
-  display: inline-block;
   width: 100%;
 }
 

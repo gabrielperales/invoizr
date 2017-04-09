@@ -1,6 +1,7 @@
 module InvoiceHelpers exposing (..)
 
 import Types exposing (ContactDetails, InvoiceLines, Line, Product, Address, Currency(..))
+import Helpers exposing (toFixed)
 
 
 currencySymb : Currency -> String
@@ -14,6 +15,16 @@ currencySymb currency =
 
         EUR ->
             "€"
+
+
+toCurrency : ( Currency, Float ) -> String
+toCurrency ( currency, amount ) =
+    case currency of
+        EUR ->
+            toFixed 2 amount ++ currencySymb currency
+
+        _ ->
+            currencySymb currency ++ toFixed 2 amount
 
 
 newEmptyLine : Line
