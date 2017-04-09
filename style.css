@@ -99,8 +99,13 @@ html, body {
   margin: 0;
 }
 
+
 .m-1em {
   margin: 1em;
+}
+
+.m-b-0-5em {
+  margin-bottom: .5em;
 }
 
 .m-b-2em {
@@ -141,6 +146,14 @@ html, body {
   color: white;
   display: block;
   height: 100px;
+  position: relative;
+}
+
+.footer .copyright {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
 }
 
 .row {

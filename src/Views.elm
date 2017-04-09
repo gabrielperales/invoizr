@@ -64,18 +64,18 @@ contactInfoView : Language -> ContactDetails -> Html Msg
 contactInfoView language { name, taxes_id, address } =
     let
         inputText val =
-            input [ class "b-none h4", type_ "text", value val ] []
+            input [ class "b-none m-b-0-5em", type_ "text", value val ] []
     in
         div []
-            [ p []
+            [ p [ class "m-b-0-5em" ]
                 [ text <| (translate language Name) ++ " :"
                 , inputText name
                 ]
-            , p []
+            , p [ class "m-b-0-5em" ]
                 [ text <| (translate language TaxId) ++ ": "
                 , inputText taxes_id
                 ]
-            , p [] [ text <| (translate language Address) ++ ": " ]
+            , p [ class "m-b-0-5em" ] [ text <| (translate language Address) ++ ": " ]
             , div [ class "p-lr-1em" ]
                 ([ address.street, address.city, address.zip ]
                     |> List.map inputText
@@ -250,11 +250,11 @@ invoiceView { invoicer, customer, invoice, currentLine, currency, language } =
             , div [ id "invoice" ]
                 [ invoiceHeader language invoicer
                 , div [ class "row p-lr-3em p-tb-1-5em" ]
-                    [ div [ class "col-4" ]
+                    [ div [ class "col-4 h5" ]
                         [ strong [] [ text <| (translate language BilledTo) ++ ": " ]
                         , contactInfoView language customer
                         ]
-                    , div [ class "col-4" ]
+                    , div [ class "col-4 h5" ]
                         [ strong [] [ text <| (translate language InvoiceNumber) ++ ": " ]
                         , inputText "#000001"
                         , p [] [ strong [] [ text <| (translate language DateOfIssue) ++ ": " ] ]
@@ -267,22 +267,24 @@ invoiceView { invoicer, customer, invoice, currentLine, currency, language } =
                     ]
                 , hr [ class "m-lr-3em b-none b-b-1px" ] []
                 , div [ class "p-lr-3em p-b-1em" ]
-                    [ p [ class "h3" ] [ text <| translate language ProjectBreakdown ]
-                    , invoiceLinesView language invoice
+                    [ div [ class "h5" ]
+                        [ p [ class "h3" ] [ text <| translate language ProjectBreakdown ]
+                        , invoiceLinesView language invoice
+                        ]
                     ]
-                , div [ class "p-lr-3em p-b-1em no-print" ]
-                    [ addLineView language currency currentLine
+                , div [ class "p-lr-3em p-b-1em no-print" ] [ addLineView language currency currentLine ]
+                , div [ class "p-lr-3em" ]
+                    [ p [ class "ta-right p" ] [ text <| (translate language Subtotal) ++ ": " ++ toCurrency ( currency, subtotal invoice ) ]
+                    , p [ class "ta-right p" ] [ text <| (translate language Taxes) ++ ": " ++ toCurrency ( currency, taxes invoice ) ]
                     ]
-                , p [ class "p-lr-3em ta-right" ] [ text <| (translate language Subtotal) ++ ": " ++ toCurrency ( currency, subtotal invoice ) ]
-                , p [ class "p-lr-3em ta-right" ] [ text <| (translate language Taxes) ++ ": " ++ toCurrency ( currency, taxes invoice ) ]
                 , p [ class "p-lr-3em ta-right" ] [ strong [] [ text <| (translate language Total) ++ ": " ++ toCurrency ( currency, total invoice ) ] ]
                 , footer [ class "footer p-1em p-lr-3em" ]
-                    [ p [ class "p ta-justify" ]
+                    [ p [ class "h6 ta-justify" ]
                         [ text
                             """IMPORTANT: The above invoice may be paid by Bank Transfer.
-                      Payment is due within 30 days from the date of this invoice, late payment is subject to a fee of 5% per month"""
+                      Payment is due within 30 days from the date of this invoice, late payment is subject to a fee of 5% per month."""
                         ]
-                    , p [ class "ta-center h6" ] [ text "Gabriel Perales ® 2017" ]
+                    , p [ class "ta-center copyright h6" ] [ text "Gabriel Perales ® 2017" ]
                     ]
                 ]
             ]
