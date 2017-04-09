@@ -165,6 +165,9 @@ addLineView language currency line =
                     "price" ->
                         UpdateCurrentLine { line | product = { product | price = floatValue } }
 
+                    "taxes" ->
+                        UpdateCurrentLine { line | product = { product | taxes = floatValue } }
+
                     "quantity" ->
                         UpdateCurrentLine { line | quantity = floatValue }
 
@@ -172,7 +175,7 @@ addLineView language currency line =
                         UpdateCurrentLine line
     in
         form [ class "row", action "javascript:void(0);", onSubmit <| AddLine line ]
-            [ label [ class "col-4" ]
+            [ label [ class "col-3" ]
                 [ text <| (translate language ServiceName) ++ ": "
                 , input
                     [ class "col-12 b-none b-b-1px h4 ta-right"
@@ -184,7 +187,7 @@ addLineView language currency line =
                     ]
                     []
                 ]
-            , label [ class "col-4" ]
+            , label [ class "col-3" ]
                 [ text <| (translate language Price) ++ " (" ++ (currencySymb currency) ++ "): "
                 , input
                     [ class "col-12 b-none b-b-1px h4 ta-right"
@@ -196,7 +199,19 @@ addLineView language currency line =
                     ]
                     []
                 ]
-            , label [ class "col-4" ]
+            , label [ class "col-3" ]
+                [ text <| (translate language Taxes) ++ " (%): "
+                , input
+                    [ class "col-12 b-none b-b-1px h4 ta-right"
+                    , type_ "number"
+                    , name "productTaxes"
+                    , placeholder (translate language Taxes)
+                    , value <| toString line.product.taxes
+                    , onInput <| updateField "taxes"
+                    ]
+                    []
+                ]
+            , label [ class "col-3" ]
                 [ text <| (translate language Quantity) ++ ": "
                 , input
                     [ class "col-12 b-none b-b-1px h4 ta-right"
