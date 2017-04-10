@@ -6,6 +6,7 @@ import Html.Events exposing (onSubmit, onInput, onClick, onDoubleClick)
 import Types exposing (ContactDetails, InvoiceLines, Line, Msg(..), Currency(..), Model)
 import InvoiceHelpers exposing (currencySymb, toCurrency, subtotalLine, subtotal, taxes, total)
 import Date
+import DatePicker
 import Helpers exposing (toFixed)
 import I18n exposing (translate, TranslationId(..), Language(..))
 
@@ -224,7 +225,7 @@ invoiceLinesView language invoiceLines =
 
 
 invoiceView : Model -> Html Msg
-invoiceView { invoicer, customer, invoice, currentLine, currency, language } =
+invoiceView { invoicer, customer, invoice, currentLine, currency, language, datePicker } =
     let
         inputText val =
             input [ class "b-none col-12 d-block h4 m-tb-1em", type_ "text", value val ] []
@@ -242,7 +243,7 @@ invoiceView { invoicer, customer, invoice, currentLine, currency, language } =
                         [ strong [] [ text <| (translate language InvoiceNumber) ++ ": " ]
                         , inputText "#000001"
                         , p [] [ strong [] [ text <| (translate language DateOfIssue) ++ ": " ] ]
-                        , inputText "01/01/2017"
+                        , DatePicker.view datePicker |> Html.map ToDatePicker
                         ]
                     , div [ class "col-4" ]
                         [ p [ class "ta-right" ] [ text <| (translate language InvoiceTotal) ++ ": " ]

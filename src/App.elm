@@ -7,6 +7,9 @@ import InvoiceHelpers exposing (exampleContact, newContact, newEmptyLine)
 import Ports exposing (..)
 import I18n exposing (Language(..))
 import ContactDetails
+import DatePicker exposing (defaultSettings)
+import Date
+import Task
 
 
 model : Model
@@ -14,6 +17,8 @@ model =
     { invoicer = exampleContact
     , customer = newContact
     , invoice = []
+    , date = Nothing
+    , datePicker = Tuple.first (DatePicker.init defaultSettings)
     , currentLine = newEmptyLine
     , currency = EUR
     , language = EN
@@ -68,6 +73,28 @@ update msg model =
         SetCurrency currency ->
             { model | currency = currency } ! [ Cmd.none ]
 
+        ToDatePicker msg_ ->
+            let
+                ( newDatePicker, datePickerFx, mDate ) =
+                    DatePicker.update msg_ model.datePicker
+
+                date =
+                    case mDate of
+                        Nothing ->
+                            model.date
+
+                        date ->
+                            date
+            in
+                { model | date = date, datePicker = newDatePicker } ! [ Cmd.map ToDatePicker datePickerFx ]
+
+        SetDate date ->
+            let
+                datePicker =
+                    Tuple.first <| DatePicker.init { defaultSettings | pickedDate = Just date }
+            in
+                { model | date = Just date, datePicker = datePicker } ! [ Cmd.none ]
+
         PrintPort ->
             model ! [ print () ]
 
@@ -83,7 +110,14 @@ init flags =
     in
         case (ContactDetails.decode invoicerstr) of
             Ok invoicer ->
-                update (UpdateInvoicer invoicer) model
+                let
+                    ( newModel, cmd ) =
+                        update (UpdateInvoicer invoicer) model
+
+                    now =
+                        Task.perform (\now -> SetDate now) Date.now
+                in
+                    newModel ! [ cmd, now ]
 
             Err _ ->
                 model ! [ Cmd.none ]

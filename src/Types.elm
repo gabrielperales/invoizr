@@ -1,12 +1,16 @@
 module Types exposing (..)
 
 import I18n exposing (Language)
+import Date exposing (Date)
+import DatePicker exposing (DatePicker)
 
 
 type alias Model =
     { invoicer : ContactDetails
     , customer : ContactDetails
     , invoice : Invoice
+    , date : Maybe Date
+    , datePicker : DatePicker
     , currentLine : Line
     , currency : Currency
     , language : Language
@@ -77,4 +81,6 @@ type Msg
     | UpdateInvoicer ContactDetails
     | SetLanguage Language
     | SetCurrency Currency
+    | ToDatePicker DatePicker.Msg
+    | SetDate Date
     | PrintPort
