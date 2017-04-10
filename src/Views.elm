@@ -63,22 +63,22 @@ invoiceHeader language invoicer =
 contactInfoView : Language -> ContactDetails -> Html Msg
 contactInfoView language { name, taxes_id, address } =
     let
-        inputText val =
-            input [ class "b-none m-b-0-5em", type_ "text", value val ] []
+        inputText pholder val =
+            input [ class "b-none m-b-0-5em", type_ "text", placeholder pholder, value val ] []
     in
         div []
             [ p [ class "m-b-0-5em" ]
                 [ text <| (translate language Name) ++ " :"
-                , inputText name
+                , inputText (translate language Name) name
                 ]
             , p [ class "m-b-0-5em" ]
                 [ text <| (translate language TaxId) ++ ": "
-                , inputText taxes_id
+                , inputText (translate language TaxId) taxes_id
                 ]
             , p [ class "m-b-0-5em" ] [ text <| (translate language Address) ++ ": " ]
             , div [ class "p-lr-1em" ]
-                ([ address.street, address.city, address.zip ]
-                    |> List.map inputText
+                ([ ( address.street, Street ), ( address.city, City ), ( address.zip, ZipCode ) ]
+                    |> List.map (\( value, translateId ) -> inputText (translate language translateId) value)
                     |> List.intersperse (br [] [])
                 )
             ]
@@ -133,7 +133,7 @@ editLineView language ( index, line ) =
                         UpdateLine index line
     in
         tr [ class "row col-12" ]
-            [ td [ class "col-3 p-0 ta-right" ] [ input [ class "col-12 ta-right", type_ "name", value <| toString name, onInput <| updateField "name" ] [] ]
+            [ td [ class "col-3 p-0 ta-right" ] [ input [ class "col-12 ta-right", type_ "name", value name, onInput <| updateField "name" ] [] ]
             , td [ class "col-3 p-0 ta-right" ] [ input [ class "col-12 ta-right", type_ "number", value <| toString price, onInput <| updateField "price" ] [] ]
             , td [ class "col-2 p-0 ta-right" ] [ input [ class "col-12 ta-right", type_ "number", value <| toString taxes, onInput <| updateField "taxes" ] [] ]
             , td [ class "col-2 p-0 ta-right" ] [ input [ class "col-12 ta-right", type_ "number", value <| toString quantity, onInput <| updateField "quantity" ] [] ]
@@ -173,56 +173,25 @@ addLineView language currency line =
 
                     _ ->
                         UpdateCurrentLine line
+
+        inputGroup ( field, ftype ) translateId val =
+            label [ class "col-3" ]
+                [ text <| (translate language translateId) ++ ": "
+                , input
+                    [ class "col-12 b-none b-b-1px h4 ta-right"
+                    , type_ ftype
+                    , placeholder (translate language translateId)
+                    , value val
+                    , onInput <| updateField field
+                    ]
+                    []
+                ]
     in
         form [ class "row", action "javascript:void(0);", onSubmit <| AddLine line ]
-            [ label [ class "col-3" ]
-                [ text <| (translate language ServiceName) ++ ": "
-                , input
-                    [ class "col-12 b-none b-b-1px h4 ta-right"
-                    , type_ "text"
-                    , name "productName"
-                    , placeholder (translate language ServiceName)
-                    , value line.product.name
-                    , onInput <| updateField "name"
-                    ]
-                    []
-                ]
-            , label [ class "col-3" ]
-                [ text <| (translate language Price) ++ " (" ++ (currencySymb currency) ++ "): "
-                , input
-                    [ class "col-12 b-none b-b-1px h4 ta-right"
-                    , type_ "number"
-                    , name "productPrice"
-                    , placeholder (translate language Price)
-                    , value <| toString line.product.price
-                    , onInput <| updateField "price"
-                    ]
-                    []
-                ]
-            , label [ class "col-3" ]
-                [ text <| (translate language Taxes) ++ " (%): "
-                , input
-                    [ class "col-12 b-none b-b-1px h4 ta-right"
-                    , type_ "number"
-                    , name "productTaxes"
-                    , placeholder (translate language Taxes)
-                    , value <| toString line.product.taxes
-                    , onInput <| updateField "taxes"
-                    ]
-                    []
-                ]
-            , label [ class "col-3" ]
-                [ text <| (translate language Quantity) ++ ": "
-                , input
-                    [ class "col-12 b-none b-b-1px h4 ta-right"
-                    , type_ "number"
-                    , name "productQty"
-                    , placeholder (translate language Quantity)
-                    , value <| toString quantity
-                    , onInput <| updateField "quantity"
-                    ]
-                    []
-                ]
+            [ inputGroup ( "name", "text" ) ServiceName line.product.name
+            , inputGroup ( "price", "number" ) Price (toString line.product.price)
+            , inputGroup ( "taxes", "number" ) Taxes (toString line.product.taxes)
+            , inputGroup ( "quantity", "number" ) Quantity (toString quantity)
             , input [ type_ "submit", value "Add line", style [ ( "visibility", "hidden" ), ( "display", "none" ) ] ] []
             ]
 

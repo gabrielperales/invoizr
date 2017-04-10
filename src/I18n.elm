@@ -7,6 +7,9 @@ type TranslationId
     | Name
     | TaxId
     | Address
+    | Street
+    | City
+    | ZipCode
     | InvoiceNumber
     | DateOfIssue
     | InvoiceTotal
@@ -49,6 +52,15 @@ translate language id =
 
                 Address ->
                     "Address"
+
+                Street ->
+                    "Street"
+
+                City ->
+                    "City"
+
+                ZipCode ->
+                    "Zip code"
 
                 InvoiceNumber ->
                     "Invoice number"
@@ -114,6 +126,15 @@ translate language id =
 
                 Address ->
                     "Dirección"
+
+                Street ->
+                    "Calle"
+
+                City ->
+                    "Ciudad"
+
+                ZipCode ->
+                    "Código postal"
 
                 InvoiceNumber ->
                     "Número de factura"

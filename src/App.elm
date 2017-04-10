@@ -3,7 +3,7 @@ module App exposing (..)
 import Types exposing (Model, Flags, Line, Product, Msg(..), Currency(..))
 import Html exposing (programWithFlags)
 import Views exposing (invoiceView)
-import InvoiceHelpers exposing (newContact, newEmptyLine)
+import InvoiceHelpers exposing (exampleContact, newContact, newEmptyLine)
 import Ports exposing (..)
 import I18n exposing (Language(..))
 import ContactDetails
@@ -11,7 +11,7 @@ import ContactDetails
 
 model : Model
 model =
-    { invoicer = newContact
+    { invoicer = exampleContact
     , customer = newContact
     , invoice = []
     , currentLine = newEmptyLine

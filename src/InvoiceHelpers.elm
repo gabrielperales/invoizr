@@ -34,6 +34,11 @@ newEmptyLine =
 
 newContact : ContactDetails
 newContact =
+    ContactDetails "" "" "" "" "" (Address "" "" "" "" "")
+
+
+exampleContact : ContactDetails
+exampleContact =
     ContactDetails
         "Sherlock & associates"
         ""
