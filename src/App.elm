@@ -7,8 +7,9 @@ import InvoiceHelpers exposing (exampleContact, newContact, newEmptyLine)
 import Ports exposing (..)
 import I18n exposing (Language(..))
 import ContactDetails
-import DatePicker exposing (defaultSettings)
 import Date
+import DatePicker
+import DatePickerHelpers exposing (..)
 import Task
 
 
@@ -18,7 +19,7 @@ model =
     , customer = newContact
     , invoice = []
     , date = Nothing
-    , datePicker = Tuple.first (DatePicker.init defaultSettings)
+    , datePicker = newDatePicker Nothing
     , currentLine = newEmptyLine
     , currency = EUR
     , language = EN
@@ -89,11 +90,7 @@ update msg model =
                 { model | date = date, datePicker = newDatePicker } ! [ Cmd.map ToDatePicker datePickerFx ]
 
         SetDate date ->
-            let
-                datePicker =
-                    Tuple.first <| DatePicker.init { defaultSettings | pickedDate = Just date }
-            in
-                { model | date = Just date, datePicker = datePicker } ! [ Cmd.none ]
+            { model | date = Just date, datePicker = newDatePicker <| Just date } ! [ Cmd.none ]
 
         PrintPort ->
             model ! [ print () ]
