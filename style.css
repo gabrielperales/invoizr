@@ -161,29 +161,56 @@ html, body {
   clear: both;
 }
 
+
 [class*="col-"] {
   float: left;
   display: inline-block;
 }
 
-.col-1 {
+.col-sm-1 {
   width: 8.33%;
 }
 
-.col-2 {
+.col-sm-2 {
   width: 16.66%;
 }
 
-.col-3 {
+.col-sm-3 {
   width: 25%;
 }
 
-.col-4 {
+.col-sm-4 {
   width: 33.33%;
 }
 
-.col-12 {
+.col-sm-6 {
+  width: 50%;
+}
+
+.col-sm-12 {
   width: 100%;
+}
+
+@media print, (min-width: 600px) {
+  .col-1 {
+    width: 8.33%;
+  }
+
+  .col-2 {
+    width: 16.66%;
+  }
+
+  .col-3 {
+    width: 25%;
+  }
+
+  .col-4 {
+    width: 33.33%;
+  }
+
+  .col-12 {
+    width: 100%;
+  }
 }
 
 @media print {

@@ -48,12 +48,12 @@ invoiceHeader language invoicer =
                 [ inputBigger name <| \value -> UpdateInvoicer { invoicer | name = value }
                 , h1 [] [ text <| translate language Invoice ]
                 ]
-            , div [ class "col-4 ta-right" ]
+            , div [ class "col-sm-6 col-4 ta-right" ]
                 [ inputDefault phone <| \value -> UpdateInvoicer { invoicer | phone = value }
                 , inputDefault email <| \value -> UpdateInvoicer { invoicer | email = value }
                 , inputDefault website <| \value -> UpdateInvoicer { invoicer | website = value }
                 ]
-            , div [ class "col-4 ta-right" ]
+            , div [ class "col-sm-6 col-4 ta-right" ]
                 [ inputDefault address.street <| \value -> UpdateInvoicer { invoicer | address = { address | street = value } }
                 , inputDefault address.city <| \value -> UpdateInvoicer { invoicer | address = { address | city = value } }
                 , inputDefault address.zip <| \value -> UpdateInvoicer { invoicer | address = { address | zip = value } }
@@ -176,10 +176,10 @@ addLineView language currency line =
                         UpdateCurrentLine line
 
         inputGroup ( field, ftype ) translateId val =
-            label [ class "col-3" ]
+            label [ class "col-sm-12 col-3" ]
                 [ text <| (translate language translateId) ++ ": "
                 , input
-                    [ class "col-12 b-none b-b-1px h4 ta-right"
+                    [ class "col-sm-12 col-12 b-none b-b-1px h4 ta-right"
                     , type_ ftype
                     , placeholder (translate language translateId)
                     , value val
