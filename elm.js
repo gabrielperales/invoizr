@@ -12297,17 +12297,17 @@ var _user$project$App$model = {
 	language: _user$project$I18n$EN
 };
 var _user$project$App$init = function (flags) {
+	var now = A2(
+		_elm_lang$core$Task$perform,
+		function (now) {
+			return _user$project$Types$SetDate(now);
+		},
+		_elm_lang$core$Date$now);
 	var _p7 = flags;
 	var invoicerjson = _p7.invoicerjson;
 	var invoicerstr = A2(_elm_lang$core$Maybe$withDefault, '', invoicerjson);
 	var _p8 = _user$project$ContactDetails$decode(invoicerstr);
 	if (_p8.ctor === 'Ok') {
-		var now = A2(
-			_elm_lang$core$Task$perform,
-			function (now) {
-				return _user$project$Types$SetDate(now);
-			},
-			_elm_lang$core$Date$now);
 		var _p9 = A2(
 			_user$project$App$update,
 			_user$project$Types$UpdateInvoicer(_p8._0),
@@ -12332,7 +12332,7 @@ var _user$project$App$init = function (flags) {
 			_user$project$App$model,
 			{
 				ctor: '::',
-				_0: _elm_lang$core$Platform_Cmd$none,
+				_0: now,
 				_1: {ctor: '[]'}
 			});
 	}
