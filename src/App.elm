@@ -104,20 +104,20 @@ init flags =
 
         invoicerstr =
             Maybe.withDefault "" invoicerjson
+
+        now =
+            Task.perform (\now -> SetDate now) Date.now
     in
         case (ContactDetails.decode invoicerstr) of
             Ok invoicer ->
                 let
                     ( newModel, cmd ) =
                         update (UpdateInvoicer invoicer) model
-
-                    now =
-                        Task.perform (\now -> SetDate now) Date.now
                 in
                     newModel ! [ cmd, now ]
 
             Err _ ->
-                model ! [ Cmd.none ]
+                model ! [ now ]
 
 
 main : Program Flags Model Msg
