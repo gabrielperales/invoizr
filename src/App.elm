@@ -3,14 +3,14 @@ module App exposing (..)
 import Types exposing (Model, Flags, Line, Product, Msg(..), Currency(..))
 import Html exposing (programWithFlags)
 import Views exposing (invoiceView)
-import InvoiceHelpers exposing (exampleContact, newContact, newEmptyLine)
+import InvoiceHelpers exposing (exampleContact, newContact, newEmptyLine, stringToCurrency, stringToLanguage)
 import Ports exposing (..)
 import I18n exposing (Language(..))
 import ContactDetails
 import Date
 import DatePicker
 import DatePickerHelpers exposing (..)
-import Task
+import Task exposing (Task)
 
 
 model : Model
@@ -69,10 +69,10 @@ update msg model =
                 { model | invoice = List.filterMap filter <| List.indexedMap (,) model.invoice } ! [ Cmd.none ]
 
         SetLanguage language ->
-            { model | language = language } ! [ Cmd.none ]
+            { model | language = language } ! [ saveLanguage <| toString language ]
 
         SetCurrency currency ->
-            { model | currency = currency } ! [ Cmd.none ]
+            { model | currency = currency } ! [ saveCurrency <| toString currency ]
 
         ToDatePicker msg_ ->
             let
@@ -99,25 +99,34 @@ update msg model =
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
-        { invoicerjson } =
-            flags
+        updateDate =
+            Task.perform SetDate Date.now
 
-        invoicerstr =
-            Maybe.withDefault "" invoicerjson
+        updateCurrency =
+            flags.currency
+                |> Maybe.withDefault ""
+                |> stringToCurrency
+                |> Result.withDefault model.currency
+                |> Task.succeed
+                |> Task.perform SetCurrency
 
-        now =
-            Task.perform (\now -> SetDate now) Date.now
+        updateLanguage =
+            flags.language
+                |> Maybe.withDefault ""
+                |> stringToLanguage
+                |> Result.withDefault model.language
+                |> Task.succeed
+                |> Task.perform SetLanguage
+
+        updateInvoicer =
+            flags.invoicer
+                |> Maybe.withDefault ""
+                |> ContactDetails.decode
+                |> Result.withDefault model.invoicer
+                |> Task.succeed
+                |> Task.perform UpdateInvoicer
     in
-        case (ContactDetails.decode invoicerstr) of
-            Ok invoicer ->
-                let
-                    ( newModel, cmd ) =
-                        update (UpdateInvoicer invoicer) model
-                in
-                    newModel ! [ cmd, now ]
-
-            Err _ ->
-                model ! [ now ]
+        model ! [ updateDate, updateCurrency, updateLanguage, updateInvoicer ]
 
 
 main : Program Flags Model Msg

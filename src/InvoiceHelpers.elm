@@ -2,6 +2,8 @@ module InvoiceHelpers exposing (..)
 
 import Types exposing (ContactDetails, InvoiceLines, Line, Product, Address, Currency(..))
 import Helpers exposing (toFixed)
+import I18n exposing (Language(..))
+import Debug exposing (log)
 
 
 currencySymb : Currency -> String
@@ -15,6 +17,35 @@ currencySymb currency =
 
         EUR ->
             "€"
+
+
+stringToCurrency : String -> Result String Currency
+stringToCurrency currency =
+    case currency of
+        "USD" ->
+            Ok USD
+
+        "GBP" ->
+            Ok GBP
+
+        "EUR" ->
+            Ok EUR
+
+        _ ->
+            Err "bad currency"
+
+
+stringToLanguage : String -> Result String Language
+stringToLanguage language =
+    case language of
+        "EN" ->
+            Ok EN
+
+        "ES" ->
+            Ok ES
+
+        _ ->
+            Err "bad language"
 
 
 toCurrency : ( Currency, Float ) -> String
