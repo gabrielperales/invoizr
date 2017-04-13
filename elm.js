@@ -10110,9 +10110,10 @@ var _user$project$Types$Model = F8(
 	function (a, b, c, d, e, f, g, h) {
 		return {invoicer: a, customer: b, invoice: c, date: d, datePicker: e, currentLine: f, currency: g, language: h};
 	});
-var _user$project$Types$Flags = function (a) {
-	return {invoicerjson: a};
-};
+var _user$project$Types$Flags = F3(
+	function (a, b, c) {
+		return {invoicer: a, currency: b, language: c};
+	});
 var _user$project$Types$ContactDetails = F6(
 	function (a, b, c, d, e, f) {
 		return {name: a, taxes_id: b, phone: c, email: d, website: e, address: f};
@@ -10357,9 +10358,33 @@ var _user$project$InvoiceHelpers$newEmptyLine = A3(
 	A3(_user$project$Types$Product, '', 0, 21),
 	1,
 	false);
+var _user$project$InvoiceHelpers$stringToLanguage = function (language) {
+	var _p8 = language;
+	switch (_p8) {
+		case 'EN':
+			return _elm_lang$core$Result$Ok(_user$project$I18n$EN);
+		case 'ES':
+			return _elm_lang$core$Result$Ok(_user$project$I18n$ES);
+		default:
+			return _elm_lang$core$Result$Err('bad language');
+	}
+};
+var _user$project$InvoiceHelpers$stringToCurrency = function (currency) {
+	var _p9 = currency;
+	switch (_p9) {
+		case 'USD':
+			return _elm_lang$core$Result$Ok(_user$project$Types$USD);
+		case 'GBP':
+			return _elm_lang$core$Result$Ok(_user$project$Types$GBP);
+		case 'EUR':
+			return _elm_lang$core$Result$Ok(_user$project$Types$EUR);
+		default:
+			return _elm_lang$core$Result$Err('bad currency');
+	}
+};
 var _user$project$InvoiceHelpers$currencySymb = function (currency) {
-	var _p8 = currency;
-	switch (_p8.ctor) {
+	var _p10 = currency;
+	switch (_p10.ctor) {
 		case 'USD':
 			return '$';
 		case 'GBP':
@@ -10368,21 +10393,21 @@ var _user$project$InvoiceHelpers$currencySymb = function (currency) {
 			return '€';
 	}
 };
-var _user$project$InvoiceHelpers$toCurrency = function (_p9) {
-	var _p10 = _p9;
-	var _p13 = _p10._0;
-	var _p12 = _p10._1;
-	var _p11 = _p13;
-	if (_p11.ctor === 'EUR') {
+var _user$project$InvoiceHelpers$toCurrency = function (_p11) {
+	var _p12 = _p11;
+	var _p15 = _p12._0;
+	var _p14 = _p12._1;
+	var _p13 = _p15;
+	if (_p13.ctor === 'EUR') {
 		return A2(
 			_elm_lang$core$Basics_ops['++'],
-			A2(_user$project$Helpers$toFixed, 2, _p12),
-			_user$project$InvoiceHelpers$currencySymb(_p13));
+			A2(_user$project$Helpers$toFixed, 2, _p14),
+			_user$project$InvoiceHelpers$currencySymb(_p15));
 	} else {
 		return A2(
 			_elm_lang$core$Basics_ops['++'],
-			_user$project$InvoiceHelpers$currencySymb(_p13),
-			A2(_user$project$Helpers$toFixed, 2, _p12));
+			_user$project$InvoiceHelpers$currencySymb(_p15),
+			A2(_user$project$Helpers$toFixed, 2, _p14));
 	}
 };
 
@@ -11920,6 +11945,16 @@ var _user$project$Ports$saveInvoicerDetails = _elm_lang$core$Native_Platform.out
 	function (v) {
 		return v;
 	});
+var _user$project$Ports$saveCurrency = _elm_lang$core$Native_Platform.outgoingPort(
+	'saveCurrency',
+	function (v) {
+		return v;
+	});
+var _user$project$Ports$saveLanguage = _elm_lang$core$Native_Platform.outgoingPort(
+	'saveLanguage',
+	function (v) {
+		return v;
+	});
 
 var _user$project$ContactDetails$decode = function (invoicer) {
 	var string = _elm_lang$core$Json_Decode$string;
@@ -12214,38 +12249,42 @@ var _user$project$App$update = F2(
 						_1: {ctor: '[]'}
 					});
 			case 'SetLanguage':
+				var _p4 = _p0._0;
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{language: _p0._0}),
+						{language: _p4}),
 					{
 						ctor: '::',
-						_0: _elm_lang$core$Platform_Cmd$none,
+						_0: _user$project$Ports$saveLanguage(
+							_elm_lang$core$Basics$toString(_p4)),
 						_1: {ctor: '[]'}
 					});
 			case 'SetCurrency':
+				var _p5 = _p0._0;
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{currency: _p0._0}),
+						{currency: _p5}),
 					{
 						ctor: '::',
-						_0: _elm_lang$core$Platform_Cmd$none,
+						_0: _user$project$Ports$saveCurrency(
+							_elm_lang$core$Basics$toString(_p5)),
 						_1: {ctor: '[]'}
 					});
 			case 'ToDatePicker':
-				var _p4 = A2(_elm_community$elm_datepicker$DatePicker$update, _p0._0, model.datePicker);
-				var newDatePicker = _p4._0;
-				var datePickerFx = _p4._1;
-				var mDate = _p4._2;
+				var _p6 = A2(_elm_community$elm_datepicker$DatePicker$update, _p0._0, model.datePicker);
+				var newDatePicker = _p6._0;
+				var datePickerFx = _p6._1;
+				var mDate = _p6._2;
 				var date = function () {
-					var _p5 = mDate;
-					if (_p5.ctor === 'Nothing') {
+					var _p7 = mDate;
+					if (_p7.ctor === 'Nothing') {
 						return model.date;
 					} else {
-						return _p5;
+						return _p7;
 					}
 				}();
 				return A2(
@@ -12259,15 +12298,15 @@ var _user$project$App$update = F2(
 						_1: {ctor: '[]'}
 					});
 			case 'SetDate':
-				var _p6 = _p0._0;
+				var _p8 = _p0._0;
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							date: _elm_lang$core$Maybe$Just(_p6),
+							date: _elm_lang$core$Maybe$Just(_p8),
 							datePicker: _user$project$DatePickerHelpers$newDatePicker(
-								_elm_lang$core$Maybe$Just(_p6))
+								_elm_lang$core$Maybe$Just(_p8))
 						}),
 					{
 						ctor: '::',
@@ -12297,45 +12336,54 @@ var _user$project$App$model = {
 	language: _user$project$I18n$EN
 };
 var _user$project$App$init = function (flags) {
-	var now = A2(
+	var updateInvoicer = A2(
 		_elm_lang$core$Task$perform,
-		function (now) {
-			return _user$project$Types$SetDate(now);
-		},
-		_elm_lang$core$Date$now);
-	var _p7 = flags;
-	var invoicerjson = _p7.invoicerjson;
-	var invoicerstr = A2(_elm_lang$core$Maybe$withDefault, '', invoicerjson);
-	var _p8 = _user$project$ContactDetails$decode(invoicerstr);
-	if (_p8.ctor === 'Ok') {
-		var _p9 = A2(
-			_user$project$App$update,
-			_user$project$Types$UpdateInvoicer(_p8._0),
-			_user$project$App$model);
-		var newModel = _p9._0;
-		var cmd = _p9._1;
-		return A2(
-			_elm_lang$core$Platform_Cmd_ops['!'],
-			newModel,
-			{
+		_user$project$Types$UpdateInvoicer,
+		_elm_lang$core$Task$succeed(
+			A2(
+				_elm_lang$core$Result$withDefault,
+				_user$project$App$model.invoicer,
+				_user$project$ContactDetails$decode(
+					A2(_elm_lang$core$Maybe$withDefault, '', flags.invoicer)))));
+	var updateLanguage = A2(
+		_elm_lang$core$Task$perform,
+		_user$project$Types$SetLanguage,
+		_elm_lang$core$Task$succeed(
+			A2(
+				_elm_lang$core$Result$withDefault,
+				_user$project$App$model.language,
+				_user$project$InvoiceHelpers$stringToLanguage(
+					A2(_elm_lang$core$Maybe$withDefault, '', flags.language)))));
+	var updateCurrency = A2(
+		_elm_lang$core$Task$perform,
+		_user$project$Types$SetCurrency,
+		_elm_lang$core$Task$succeed(
+			A2(
+				_elm_lang$core$Result$withDefault,
+				_user$project$App$model.currency,
+				_user$project$InvoiceHelpers$stringToCurrency(
+					A2(_elm_lang$core$Maybe$withDefault, '', flags.currency)))));
+	var updateDate = A2(_elm_lang$core$Task$perform, _user$project$Types$SetDate, _elm_lang$core$Date$now);
+	return A2(
+		_elm_lang$core$Platform_Cmd_ops['!'],
+		_user$project$App$model,
+		{
+			ctor: '::',
+			_0: updateDate,
+			_1: {
 				ctor: '::',
-				_0: cmd,
+				_0: updateCurrency,
 				_1: {
 					ctor: '::',
-					_0: now,
-					_1: {ctor: '[]'}
+					_0: updateLanguage,
+					_1: {
+						ctor: '::',
+						_0: updateInvoicer,
+						_1: {ctor: '[]'}
+					}
 				}
-			});
-	} else {
-		return A2(
-			_elm_lang$core$Platform_Cmd_ops['!'],
-			_user$project$App$model,
-			{
-				ctor: '::',
-				_0: now,
-				_1: {ctor: '[]'}
-			});
-	}
+			}
+		});
 };
 var _user$project$App$main = _elm_lang$html$Html$programWithFlags(
 	{
@@ -12346,13 +12394,47 @@ var _user$project$App$main = _elm_lang$html$Html$programWithFlags(
 	})(
 	A2(
 		_elm_lang$core$Json_Decode$andThen,
-		function (invoicerjson) {
-			return _elm_lang$core$Json_Decode$succeed(
-				{invoicerjson: invoicerjson});
+		function (currency) {
+			return A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (invoicer) {
+					return A2(
+						_elm_lang$core$Json_Decode$andThen,
+						function (language) {
+							return _elm_lang$core$Json_Decode$succeed(
+								{currency: currency, invoicer: invoicer, language: language});
+						},
+						A2(
+							_elm_lang$core$Json_Decode$field,
+							'language',
+							_elm_lang$core$Json_Decode$oneOf(
+								{
+									ctor: '::',
+									_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Maybe$Nothing),
+									_1: {
+										ctor: '::',
+										_0: A2(_elm_lang$core$Json_Decode$map, _elm_lang$core$Maybe$Just, _elm_lang$core$Json_Decode$string),
+										_1: {ctor: '[]'}
+									}
+								})));
+				},
+				A2(
+					_elm_lang$core$Json_Decode$field,
+					'invoicer',
+					_elm_lang$core$Json_Decode$oneOf(
+						{
+							ctor: '::',
+							_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Maybe$Nothing),
+							_1: {
+								ctor: '::',
+								_0: A2(_elm_lang$core$Json_Decode$map, _elm_lang$core$Maybe$Just, _elm_lang$core$Json_Decode$string),
+								_1: {ctor: '[]'}
+							}
+						})));
 		},
 		A2(
 			_elm_lang$core$Json_Decode$field,
-			'invoicerjson',
+			'currency',
 			_elm_lang$core$Json_Decode$oneOf(
 				{
 					ctor: '::',
