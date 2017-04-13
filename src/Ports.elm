@@ -5,3 +5,9 @@ port print : () -> Cmd msg
 
 
 port saveInvoicerDetails : String -> Cmd msg
+
+
+port saveCurrency : String -> Cmd msg
+
+
+port saveLanguage : String -> Cmd msg

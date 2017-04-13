@@ -15,14 +15,26 @@
   <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
   <script src="elm.js"></script>
   <script>
-  var app = Elm.App.fullscreen({invoicerjson: localStorage.getItem('invoicerDetails')});
+  var app = Elm.App.fullscreen({
+    invoicer: localStorage.getItem('invoicer'),
+    currency: localStorage.getItem('currency'),
+    language: localStorage.getItem('language'),
+  });
 
   app.ports.print.subscribe(function(){
     window.print();
   });
 
-  app.ports.saveInvoicerDetails.subscribe(function(invoicerDetails){
-    localStorage.setItem('invoicerDetails', invoicerDetails);
+  app.ports.saveInvoicerDetails.subscribe(function(invoicer){
+    localStorage.setItem('invoicer', invoicer);
+  });
+
+  app.ports.saveCurrency.subscribe(function(currency){
+    localStorage.setItem('currency', currency);
+  });
+
+  app.ports.saveLanguage.subscribe(function(language){
+    localStorage.setItem('language', language);
   });
   </script>
 </body>
