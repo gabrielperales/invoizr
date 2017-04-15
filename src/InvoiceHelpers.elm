@@ -1,6 +1,6 @@
 module InvoiceHelpers exposing (..)
 
-import Types exposing (ContactDetails, InvoiceLines, Line, Product, Address, Currency(..))
+import Types exposing (ContactDetails, InvoiceLines, Line, Product, Address, Currency(..), Deduction)
 import Helpers exposing (toFixed)
 import I18n exposing (Language(..))
 import Debug exposing (log)
@@ -135,6 +135,11 @@ subtotal =
 taxes : InvoiceLines -> Float
 taxes =
     List.map taxesLine >> List.foldr (+) 0
+
+
+deductions : Deduction -> InvoiceLines -> Float
+deductions deduction invoicelines =
+    (subtotal invoicelines) * ((Maybe.withDefault 0.0 deduction) / 100)
 
 
 total : InvoiceLines -> Float

@@ -23,6 +23,7 @@ model =
     , currentLine = newEmptyLine
     , currency = EUR
     , language = EN
+    , deduction = Nothing
     }
 
 
@@ -92,8 +93,26 @@ update msg model =
         SetDate date ->
             { model | date = Just date, datePicker = newDatePicker <| Just date } ! [ Cmd.none ]
 
+        ToggleDeductions ->
+            let
+                deduction =
+                    case model.deduction of
+                        Just _ ->
+                            Nothing
+
+                        _ ->
+                            Just 0
+            in
+                { model | deduction = deduction } ! [ saveDeduction deduction ]
+
+        SetDeduction deduction ->
+            { model | deduction = Just deduction } ! [ saveDeduction <| Just deduction ]
+
         PrintPort ->
             model ! [ print () ]
+
+        NoOp ->
+            model ! []
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -125,8 +144,26 @@ init flags =
                 |> Result.withDefault model.invoicer
                 |> Task.succeed
                 |> Task.perform UpdateInvoicer
+
+        updateDeduction =
+            (case flags.deduction of
+                Just deduction ->
+                    Task.succeed (Result.withDefault 0 <| String.toFloat deduction)
+
+                _ ->
+                    Task.fail "not stored deduction"
+            )
+                |> Task.attempt
+                    (\result ->
+                        case result of
+                            Ok deduction ->
+                                SetDeduction deduction
+
+                            _ ->
+                                NoOp
+                    )
     in
-        model ! [ updateDate, updateCurrency, updateLanguage, updateInvoicer ]
+        model ! [ updateDate, updateCurrency, updateLanguage, updateInvoicer, updateDeduction ]
 
 
 main : Program Flags Model Msg

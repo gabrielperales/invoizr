@@ -1,31 +1,45 @@
 module Views exposing (..)
 
 import Html exposing (..)
-import Html.Attributes exposing (type_, name, placeholder, value, action, id, class, style)
+import Html.Attributes exposing (type_, checked, name, placeholder, value, action, id, class, style)
 import Html.Events exposing (onSubmit, onInput, onClick, onDoubleClick)
-import Types exposing (ContactDetails, InvoiceLines, Line, Msg(..), Currency(..), Model)
-import InvoiceHelpers exposing (currencySymb, toCurrency, subtotalLine, subtotal, taxes, total)
+import Types exposing (ContactDetails, InvoiceLines, Line, Deduction, Msg(..), Currency(..), Model)
+import InvoiceHelpers exposing (currencySymb, toCurrency, subtotalLine, subtotal, taxes, deductions, total)
 import Date
 import DatePicker
 import Helpers exposing (toFixed)
 import I18n exposing (translate, TranslationId(..), Language(..))
 
 
-toolbar : Language -> Html Msg
-toolbar language =
-    div [ class "no-print m-tb-1em" ]
-        [ button [ onClick <| SetLanguage EN ] [ text <| translate language English ]
-        , text "|"
-        , button [ onClick <| SetLanguage ES ] [ text <| translate language Spanish ]
-        , text "|"
-        , button [ onClick <| SetCurrency EUR ] [ text "€" ]
-        , text "|"
-        , button [ onClick <| SetCurrency GBP ] [ text "£" ]
-        , text "|"
-        , button [ onClick <| SetCurrency USD ] [ text "$" ]
-        , text "|"
-        , button [ onClick PrintPort ] [ text <| translate language Print ]
-        ]
+toolbar : Deduction -> Language -> Html Msg
+toolbar deduction language =
+    let
+        isChecked =
+            case deduction of
+                Just _ ->
+                    True
+
+                _ ->
+                    False
+    in
+        div [ class "no-print m-tb-1em" ]
+            [ button [ onClick <| SetLanguage EN ] [ text <| translate language English ]
+            , text "|"
+            , button [ onClick <| SetLanguage ES ] [ text <| translate language Spanish ]
+            , text "|"
+            , button [ onClick <| SetCurrency EUR ] [ text "€" ]
+            , text "|"
+            , button [ onClick <| SetCurrency GBP ] [ text "£" ]
+            , text "|"
+            , button [ onClick <| SetCurrency USD ] [ text "$" ]
+            , text "|"
+            , button [ onClick PrintPort ] [ text <| translate language Print ]
+            , text "|"
+            , label [ class "p" ]
+                [ text <| translate language Deductions
+                , input [ type_ "checkbox", checked isChecked, onClick ToggleDeductions ] []
+                ]
+            ]
 
 
 invoiceHeader : Language -> ContactDetails -> Html Msg
@@ -225,13 +239,31 @@ invoiceLinesView language invoiceLines =
 
 
 invoiceView : Model -> Html Msg
-invoiceView { invoicer, customer, invoice, currentLine, currency, language, datePicker } =
+invoiceView model =
     let
+        { invoicer, customer, invoice, currentLine, currency, language, datePicker } =
+            model
+
         inputText val =
             input [ class "b-none col-12 d-block h4 m-tb-1em", type_ "text", value val ] []
+
+        deduction =
+            deductions model.deduction invoice
+
+        subtotalInvoice =
+            toCurrency ( currency, subtotal invoice )
+
+        taxesInvoice =
+            toCurrency ( currency, taxes invoice )
+
+        deductionInvoice =
+            toCurrency ( currency, deduction )
+
+        totalInvoice =
+            toCurrency ( currency, (total invoice) - deduction )
     in
         div [ class "wrapper" ]
-            [ toolbar language
+            [ toolbar model.deduction language
             , div [ id "invoice" ]
                 [ invoiceHeader language invoicer
                 , div [ class "row p-lr-3em p-tb-1-5em" ]
@@ -247,7 +279,7 @@ invoiceView { invoicer, customer, invoice, currentLine, currency, language, date
                         ]
                     , div [ class "col-4" ]
                         [ p [ class "ta-right" ] [ text <| (translate language InvoiceTotal) ++ ": " ]
-                        , h1 [ class "ta-right h1 total" ] [ text <| toCurrency ( currency, total invoice ) ]
+                        , h1 [ class "ta-right h1 total" ] [ text <| totalInvoice ]
                         ]
                     ]
                 , hr [ class "m-lr-3em b-none b-b-1px" ] []
@@ -259,10 +291,22 @@ invoiceView { invoicer, customer, invoice, currentLine, currency, language, date
                     ]
                 , div [ class "p-lr-3em p-b-1em no-print" ] [ addLineView language currency currentLine ]
                 , div [ class "p-lr-3em" ]
-                    [ p [ class "ta-right p" ] [ text <| (translate language Subtotal) ++ ": " ++ toCurrency ( currency, subtotal invoice ) ]
-                    , p [ class "ta-right p" ] [ text <| (translate language Taxes) ++ ": " ++ toCurrency ( currency, taxes invoice ) ]
+                    [ p [ class "ta-right p" ] [ text <| (translate language Subtotal) ++ ": " ++ subtotalInvoice ]
+                    , p [ class "ta-right p" ] [ text <| (translate language Taxes) ++ ": " ++ taxesInvoice ]
+                    , case model.deduction of
+                        Just percentage ->
+                            div [ class "ta-right p" ]
+                                [ label [ class "no-print" ]
+                                    [ text <| (translate language Deductions) ++ ": "
+                                    , input [ class "ta-right", type_ "number", value (toString percentage), onInput (\val -> val |> String.toFloat |> Result.withDefault 0 |> SetDeduction) ] []
+                                    ]
+                                , p [] [ text <| (translate language Deductions) ++ ": " ++ deductionInvoice ]
+                                ]
+
+                        _ ->
+                            text ""
                     ]
-                , p [ class "p-lr-3em ta-right" ] [ strong [] [ text <| (translate language Total) ++ ": " ++ toCurrency ( currency, total invoice ) ] ]
+                , p [ class "p-lr-3em ta-right" ] [ strong [] [ text <| (translate language Total) ++ ": " ++ totalInvoice ] ]
                 , footer [ class "footer p-1em p-lr-3em" ]
                     [ p [ class "h6 ta-justify" ]
                         [ text

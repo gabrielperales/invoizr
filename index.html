@@ -19,6 +19,7 @@
     invoicer: localStorage.getItem('invoicer'),
     currency: localStorage.getItem('currency'),
     language: localStorage.getItem('language'),
+    deduction: localStorage.getItem('deduction'),
   });
 
   app.ports.print.subscribe(function(){
@@ -35,6 +36,14 @@
 
   app.ports.saveLanguage.subscribe(function(language){
     localStorage.setItem('language', language);
+  });
+
+  app.ports.saveDeduction.subscribe(function(deduction){
+    if (deduction !== null) {
+      localStorage.setItem('deduction', deduction);
+    } else {
+      localStorage.removeItem('deduction');
+    }
   });
   </script>
 </body>

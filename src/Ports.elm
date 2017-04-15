@@ -11,3 +11,6 @@ port saveCurrency : String -> Cmd msg
 
 
 port saveLanguage : String -> Cmd msg
+
+
+port saveDeduction : Maybe Float -> Cmd msg
