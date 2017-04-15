@@ -14,6 +14,7 @@ type alias Model =
     , currentLine : Line
     , currency : Currency
     , language : Language
+    , deduction : Deduction
     }
 
 
@@ -21,7 +22,12 @@ type alias Flags =
     { invoicer : Maybe String
     , currency : Maybe String
     , language : Maybe String
+    , deduction : Maybe String
     }
+
+
+type alias Deduction =
+    Maybe Float
 
 
 type Currency
@@ -86,4 +92,7 @@ type Msg
     | SetCurrency Currency
     | ToDatePicker DatePicker.Msg
     | SetDate Date
+    | ToggleDeductions
+    | SetDeduction Float
     | PrintPort
+    | NoOp

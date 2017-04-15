@@ -26,6 +26,7 @@ type TranslationId
     | Print
     | English
     | Spanish
+    | Deductions
 
 
 type Language
@@ -110,6 +111,9 @@ translate language id =
                 English ->
                     "English"
 
+                Deductions ->
+                    "Deductions"
+
         ES ->
             case id of
                 Invoice ->
@@ -183,3 +187,6 @@ translate language id =
 
                 English ->
                     "Inglés"
+
+                Deductions ->
+                    "Retenciones"
