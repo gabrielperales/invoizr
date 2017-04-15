@@ -10022,8 +10022,10 @@ var _user$project$I18n$translate = F2(
 					return 'Print';
 				case 'Spanish':
 					return 'Spanish';
-				default:
+				case 'English':
 					return 'English';
+				default:
+					return 'Deductions';
 			}
 		} else {
 			var _p2 = id;
@@ -10074,11 +10076,14 @@ var _user$project$I18n$translate = F2(
 					return 'Imprimir';
 				case 'Spanish':
 					return 'Español';
-				default:
+				case 'English':
 					return 'Inglés';
+				default:
+					return 'Retenciones';
 			}
 		}
 	});
+var _user$project$I18n$Deductions = {ctor: 'Deductions'};
 var _user$project$I18n$Spanish = {ctor: 'Spanish'};
 var _user$project$I18n$English = {ctor: 'English'};
 var _user$project$I18n$Print = {ctor: 'Print'};
@@ -10106,13 +10111,13 @@ var _user$project$I18n$Invoice = {ctor: 'Invoice'};
 var _user$project$I18n$ES = {ctor: 'ES'};
 var _user$project$I18n$EN = {ctor: 'EN'};
 
-var _user$project$Types$Model = F8(
-	function (a, b, c, d, e, f, g, h) {
-		return {invoicer: a, customer: b, invoice: c, date: d, datePicker: e, currentLine: f, currency: g, language: h};
+var _user$project$Types$Model = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {invoicer: a, customer: b, invoice: c, date: d, datePicker: e, currentLine: f, currency: g, language: h, deduction: i};
 	});
-var _user$project$Types$Flags = F3(
-	function (a, b, c) {
-		return {invoicer: a, currency: b, language: c};
+var _user$project$Types$Flags = F4(
+	function (a, b, c, d) {
+		return {invoicer: a, currency: b, language: c, deduction: d};
 	});
 var _user$project$Types$ContactDetails = F6(
 	function (a, b, c, d, e, f) {
@@ -10133,7 +10138,12 @@ var _user$project$Types$Line = F3(
 var _user$project$Types$GBP = {ctor: 'GBP'};
 var _user$project$Types$USD = {ctor: 'USD'};
 var _user$project$Types$EUR = {ctor: 'EUR'};
+var _user$project$Types$NoOp = {ctor: 'NoOp'};
 var _user$project$Types$PrintPort = {ctor: 'PrintPort'};
+var _user$project$Types$SetDeduction = function (a) {
+	return {ctor: 'SetDeduction', _0: a};
+};
+var _user$project$Types$ToggleDeductions = {ctor: 'ToggleDeductions'};
 var _user$project$Types$SetDate = function (a) {
 	return {ctor: 'SetDate', _0: a};
 };
@@ -10297,6 +10307,10 @@ var _user$project$InvoiceHelpers$subtotal = function (_p7) {
 		0,
 		A2(_elm_lang$core$List$map, _user$project$InvoiceHelpers$subtotalLine, _p7));
 };
+var _user$project$InvoiceHelpers$deductions = F2(
+	function (deduction, invoicelines) {
+		return _user$project$InvoiceHelpers$subtotal(invoicelines) * (A2(_elm_lang$core$Maybe$withDefault, 0.0, deduction) / 100);
+	});
 var _user$project$InvoiceHelpers$updateLineQuantity = F2(
 	function (cty, line) {
 		return (_elm_lang$core$Native_Utils.cmp(cty, 0) < 0) ? _elm_lang$core$Native_Utils.update(
@@ -11396,122 +11410,171 @@ var _user$project$Views$invoiceHeader = F2(
 				}
 			});
 	});
-var _user$project$Views$toolbar = function (language) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('no-print m-tb-1em'),
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$button,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onClick(
-						_user$project$Types$SetLanguage(_user$project$I18n$EN)),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text(
-						A2(_user$project$I18n$translate, language, _user$project$I18n$English)),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
+var _user$project$Views$toolbar = F2(
+	function (deduction, language) {
+		var isChecked = function () {
+			var _p23 = deduction;
+			if (_p23.ctor === 'Just') {
+				return true;
+			} else {
+				return false;
+			}
+		}();
+		return A2(
+			_elm_lang$html$Html$div,
+			{
 				ctor: '::',
-				_0: _elm_lang$html$Html$text('|'),
+				_0: _elm_lang$html$Html_Attributes$class('no-print m-tb-1em'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$button,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(
+							_user$project$Types$SetLanguage(_user$project$I18n$EN)),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(
+							A2(_user$project$I18n$translate, language, _user$project$I18n$English)),
+						_1: {ctor: '[]'}
+					}),
 				_1: {
 					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$button,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(
-								_user$project$Types$SetLanguage(_user$project$I18n$ES)),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text(
-								A2(_user$project$I18n$translate, language, _user$project$I18n$Spanish)),
-							_1: {ctor: '[]'}
-						}),
+					_0: _elm_lang$html$Html$text('|'),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$html$Html$text('|'),
+						_0: A2(
+							_elm_lang$html$Html$button,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(
+									_user$project$Types$SetLanguage(_user$project$I18n$ES)),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(
+									A2(_user$project$I18n$translate, language, _user$project$I18n$Spanish)),
+								_1: {ctor: '[]'}
+							}),
 						_1: {
 							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$button,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onClick(
-										_user$project$Types$SetCurrency(_user$project$Types$EUR)),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('€'),
-									_1: {ctor: '[]'}
-								}),
+							_0: _elm_lang$html$Html$text('|'),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html$text('|'),
+								_0: A2(
+									_elm_lang$html$Html$button,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(
+											_user$project$Types$SetCurrency(_user$project$Types$EUR)),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('€'),
+										_1: {ctor: '[]'}
+									}),
 								_1: {
 									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$button,
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(
-												_user$project$Types$SetCurrency(_user$project$Types$GBP)),
-											_1: {ctor: '[]'}
-										},
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html$text('£'),
-											_1: {ctor: '[]'}
-										}),
+									_0: _elm_lang$html$Html$text('|'),
 									_1: {
 										ctor: '::',
-										_0: _elm_lang$html$Html$text('|'),
+										_0: A2(
+											_elm_lang$html$Html$button,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onClick(
+													_user$project$Types$SetCurrency(_user$project$Types$GBP)),
+												_1: {ctor: '[]'}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('£'),
+												_1: {ctor: '[]'}
+											}),
 										_1: {
 											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$button,
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html_Events$onClick(
-														_user$project$Types$SetCurrency(_user$project$Types$USD)),
-													_1: {ctor: '[]'}
-												},
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html$text('$'),
-													_1: {ctor: '[]'}
-												}),
+											_0: _elm_lang$html$Html$text('|'),
 											_1: {
 												ctor: '::',
-												_0: _elm_lang$html$Html$text('|'),
+												_0: A2(
+													_elm_lang$html$Html$button,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Events$onClick(
+															_user$project$Types$SetCurrency(_user$project$Types$USD)),
+														_1: {ctor: '[]'}
+													},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('$'),
+														_1: {ctor: '[]'}
+													}),
 												_1: {
 													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$button,
-														{
+													_0: _elm_lang$html$Html$text('|'),
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$button,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Events$onClick(_user$project$Types$PrintPort),
+																_1: {ctor: '[]'}
+															},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text(
+																	A2(_user$project$I18n$translate, language, _user$project$I18n$Print)),
+																_1: {ctor: '[]'}
+															}),
+														_1: {
 															ctor: '::',
-															_0: _elm_lang$html$Html_Events$onClick(_user$project$Types$PrintPort),
-															_1: {ctor: '[]'}
-														},
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html$text(
-																A2(_user$project$I18n$translate, language, _user$project$I18n$Print)),
-															_1: {ctor: '[]'}
-														}),
-													_1: {ctor: '[]'}
+															_0: _elm_lang$html$Html$text('|'),
+															_1: {
+																ctor: '::',
+																_0: A2(
+																	_elm_lang$html$Html$label,
+																	{
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Attributes$class('p'),
+																		_1: {ctor: '[]'}
+																	},
+																	{
+																		ctor: '::',
+																		_0: _elm_lang$html$Html$text(
+																			A2(_user$project$I18n$translate, language, _user$project$I18n$Deductions)),
+																		_1: {
+																			ctor: '::',
+																			_0: A2(
+																				_elm_lang$html$Html$input,
+																				{
+																					ctor: '::',
+																					_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+																					_1: {
+																						ctor: '::',
+																						_0: _elm_lang$html$Html_Attributes$checked(isChecked),
+																						_1: {
+																							ctor: '::',
+																							_0: _elm_lang$html$Html_Events$onClick(_user$project$Types$ToggleDeductions),
+																							_1: {ctor: '[]'}
+																						}
+																					}
+																				},
+																				{ctor: '[]'}),
+																			_1: {ctor: '[]'}
+																		}
+																	}),
+																_1: {ctor: '[]'}
+															}
+														}
+													}
 												}
 											}
 										}
@@ -11521,14 +11584,9 @@ var _user$project$Views$toolbar = function (language) {
 						}
 					}
 				}
-			}
-		});
-};
-var _user$project$Views$invoiceView = function (_p23) {
-	var _p24 = _p23;
-	var _p27 = _p24.language;
-	var _p26 = _p24.invoice;
-	var _p25 = _p24.currency;
+			});
+	});
+var _user$project$Views$invoiceView = function (model) {
 	var inputText = function (val) {
 		return A2(
 			_elm_lang$html$Html$input,
@@ -11547,6 +11605,35 @@ var _user$project$Views$invoiceView = function (_p23) {
 			},
 			{ctor: '[]'});
 	};
+	var _p24 = model;
+	var invoicer = _p24.invoicer;
+	var customer = _p24.customer;
+	var invoice = _p24.invoice;
+	var currentLine = _p24.currentLine;
+	var currency = _p24.currency;
+	var language = _p24.language;
+	var datePicker = _p24.datePicker;
+	var deduction = A2(_user$project$InvoiceHelpers$deductions, model.deduction, invoice);
+	var subtotalInvoice = _user$project$InvoiceHelpers$toCurrency(
+		{
+			ctor: '_Tuple2',
+			_0: currency,
+			_1: _user$project$InvoiceHelpers$subtotal(invoice)
+		});
+	var taxesInvoice = _user$project$InvoiceHelpers$toCurrency(
+		{
+			ctor: '_Tuple2',
+			_0: currency,
+			_1: _user$project$InvoiceHelpers$taxes(invoice)
+		});
+	var deductionInvoice = _user$project$InvoiceHelpers$toCurrency(
+		{ctor: '_Tuple2', _0: currency, _1: deduction});
+	var totalInvoice = _user$project$InvoiceHelpers$toCurrency(
+		{
+			ctor: '_Tuple2',
+			_0: currency,
+			_1: _user$project$InvoiceHelpers$total(invoice) - deduction
+		});
 	return A2(
 		_elm_lang$html$Html$div,
 		{
@@ -11556,7 +11643,7 @@ var _user$project$Views$invoiceView = function (_p23) {
 		},
 		{
 			ctor: '::',
-			_0: _user$project$Views$toolbar(_p27),
+			_0: A2(_user$project$Views$toolbar, model.deduction, language),
 			_1: {
 				ctor: '::',
 				_0: A2(
@@ -11568,7 +11655,7 @@ var _user$project$Views$invoiceView = function (_p23) {
 					},
 					{
 						ctor: '::',
-						_0: A2(_user$project$Views$invoiceHeader, _p27, _p24.invoicer),
+						_0: A2(_user$project$Views$invoiceHeader, language, invoicer),
 						_1: {
 							ctor: '::',
 							_0: A2(
@@ -11597,13 +11684,13 @@ var _user$project$Views$invoiceView = function (_p23) {
 													_0: _elm_lang$html$Html$text(
 														A2(
 															_elm_lang$core$Basics_ops['++'],
-															A2(_user$project$I18n$translate, _p27, _user$project$I18n$BilledTo),
+															A2(_user$project$I18n$translate, language, _user$project$I18n$BilledTo),
 															': ')),
 													_1: {ctor: '[]'}
 												}),
 											_1: {
 												ctor: '::',
-												_0: A2(_user$project$Views$contactInfoView, _p27, _p24.customer),
+												_0: A2(_user$project$Views$contactInfoView, language, customer),
 												_1: {ctor: '[]'}
 											}
 										}),
@@ -11626,7 +11713,7 @@ var _user$project$Views$invoiceView = function (_p23) {
 														_0: _elm_lang$html$Html$text(
 															A2(
 																_elm_lang$core$Basics_ops['++'],
-																A2(_user$project$I18n$translate, _p27, _user$project$I18n$InvoiceNumber),
+																A2(_user$project$I18n$translate, language, _user$project$I18n$InvoiceNumber),
 																': ')),
 														_1: {ctor: '[]'}
 													}),
@@ -11648,7 +11735,7 @@ var _user$project$Views$invoiceView = function (_p23) {
 																		_0: _elm_lang$html$Html$text(
 																			A2(
 																				_elm_lang$core$Basics_ops['++'],
-																				A2(_user$project$I18n$translate, _p27, _user$project$I18n$DateOfIssue),
+																				A2(_user$project$I18n$translate, language, _user$project$I18n$DateOfIssue),
 																				': ')),
 																		_1: {ctor: '[]'}
 																	}),
@@ -11659,7 +11746,7 @@ var _user$project$Views$invoiceView = function (_p23) {
 															_0: A2(
 																_elm_lang$html$Html$map,
 																_user$project$Types$ToDatePicker,
-																_elm_community$elm_datepicker$DatePicker$view(_p24.datePicker)),
+																_elm_community$elm_datepicker$DatePicker$view(datePicker)),
 															_1: {ctor: '[]'}
 														}
 													}
@@ -11688,7 +11775,7 @@ var _user$project$Views$invoiceView = function (_p23) {
 															_0: _elm_lang$html$Html$text(
 																A2(
 																	_elm_lang$core$Basics_ops['++'],
-																	A2(_user$project$I18n$translate, _p27, _user$project$I18n$InvoiceTotal),
+																	A2(_user$project$I18n$translate, language, _user$project$I18n$InvoiceTotal),
 																	': ')),
 															_1: {ctor: '[]'}
 														}),
@@ -11703,13 +11790,7 @@ var _user$project$Views$invoiceView = function (_p23) {
 															},
 															{
 																ctor: '::',
-																_0: _elm_lang$html$Html$text(
-																	_user$project$InvoiceHelpers$toCurrency(
-																		{
-																			ctor: '_Tuple2',
-																			_0: _p25,
-																			_1: _user$project$InvoiceHelpers$total(_p26)
-																		})),
+																_0: _elm_lang$html$Html$text(totalInvoice),
 																_1: {ctor: '[]'}
 															}),
 														_1: {ctor: '[]'}
@@ -11759,12 +11840,12 @@ var _user$project$Views$invoiceView = function (_p23) {
 														{
 															ctor: '::',
 															_0: _elm_lang$html$Html$text(
-																A2(_user$project$I18n$translate, _p27, _user$project$I18n$ProjectBreakdown)),
+																A2(_user$project$I18n$translate, language, _user$project$I18n$ProjectBreakdown)),
 															_1: {ctor: '[]'}
 														}),
 													_1: {
 														ctor: '::',
-														_0: A2(_user$project$Views$invoiceLinesView, _p27, _p26),
+														_0: A2(_user$project$Views$invoiceLinesView, language, invoice),
 														_1: {ctor: '[]'}
 													}
 												}),
@@ -11781,7 +11862,7 @@ var _user$project$Views$invoiceView = function (_p23) {
 											},
 											{
 												ctor: '::',
-												_0: A3(_user$project$Views$addLineView, _p27, _p25, _p24.currentLine),
+												_0: A3(_user$project$Views$addLineView, language, currency, currentLine),
 												_1: {ctor: '[]'}
 											}),
 										_1: {
@@ -11807,16 +11888,8 @@ var _user$project$Views$invoiceView = function (_p23) {
 															_0: _elm_lang$html$Html$text(
 																A2(
 																	_elm_lang$core$Basics_ops['++'],
-																	A2(_user$project$I18n$translate, _p27, _user$project$I18n$Subtotal),
-																	A2(
-																		_elm_lang$core$Basics_ops['++'],
-																		': ',
-																		_user$project$InvoiceHelpers$toCurrency(
-																			{
-																				ctor: '_Tuple2',
-																				_0: _p25,
-																				_1: _user$project$InvoiceHelpers$subtotal(_p26)
-																			})))),
+																	A2(_user$project$I18n$translate, language, _user$project$I18n$Subtotal),
+																	A2(_elm_lang$core$Basics_ops['++'], ': ', subtotalInvoice))),
 															_1: {ctor: '[]'}
 														}),
 													_1: {
@@ -11833,19 +11906,94 @@ var _user$project$Views$invoiceView = function (_p23) {
 																_0: _elm_lang$html$Html$text(
 																	A2(
 																		_elm_lang$core$Basics_ops['++'],
-																		A2(_user$project$I18n$translate, _p27, _user$project$I18n$Taxes),
-																		A2(
-																			_elm_lang$core$Basics_ops['++'],
-																			': ',
-																			_user$project$InvoiceHelpers$toCurrency(
-																				{
-																					ctor: '_Tuple2',
-																					_0: _p25,
-																					_1: _user$project$InvoiceHelpers$taxes(_p26)
-																				})))),
+																		A2(_user$project$I18n$translate, language, _user$project$I18n$Taxes),
+																		A2(_elm_lang$core$Basics_ops['++'], ': ', taxesInvoice))),
 																_1: {ctor: '[]'}
 															}),
-														_1: {ctor: '[]'}
+														_1: {
+															ctor: '::',
+															_0: function () {
+																var _p25 = model.deduction;
+																if (_p25.ctor === 'Just') {
+																	return A2(
+																		_elm_lang$html$Html$div,
+																		{
+																			ctor: '::',
+																			_0: _elm_lang$html$Html_Attributes$class('ta-right p'),
+																			_1: {ctor: '[]'}
+																		},
+																		{
+																			ctor: '::',
+																			_0: A2(
+																				_elm_lang$html$Html$label,
+																				{
+																					ctor: '::',
+																					_0: _elm_lang$html$Html_Attributes$class('no-print'),
+																					_1: {ctor: '[]'}
+																				},
+																				{
+																					ctor: '::',
+																					_0: _elm_lang$html$Html$text(
+																						A2(
+																							_elm_lang$core$Basics_ops['++'],
+																							A2(_user$project$I18n$translate, language, _user$project$I18n$Deductions),
+																							': ')),
+																					_1: {
+																						ctor: '::',
+																						_0: A2(
+																							_elm_lang$html$Html$input,
+																							{
+																								ctor: '::',
+																								_0: _elm_lang$html$Html_Attributes$class('ta-right'),
+																								_1: {
+																									ctor: '::',
+																									_0: _elm_lang$html$Html_Attributes$type_('number'),
+																									_1: {
+																										ctor: '::',
+																										_0: _elm_lang$html$Html_Attributes$value(
+																											_elm_lang$core$Basics$toString(_p25._0)),
+																										_1: {
+																											ctor: '::',
+																											_0: _elm_lang$html$Html_Events$onInput(
+																												function (val) {
+																													return _user$project$Types$SetDeduction(
+																														A2(
+																															_elm_lang$core$Result$withDefault,
+																															0,
+																															_elm_lang$core$String$toFloat(val)));
+																												}),
+																											_1: {ctor: '[]'}
+																										}
+																									}
+																								}
+																							},
+																							{ctor: '[]'}),
+																						_1: {ctor: '[]'}
+																					}
+																				}),
+																			_1: {
+																				ctor: '::',
+																				_0: A2(
+																					_elm_lang$html$Html$p,
+																					{ctor: '[]'},
+																					{
+																						ctor: '::',
+																						_0: _elm_lang$html$Html$text(
+																							A2(
+																								_elm_lang$core$Basics_ops['++'],
+																								A2(_user$project$I18n$translate, language, _user$project$I18n$Deductions),
+																								A2(_elm_lang$core$Basics_ops['++'], ': ', deductionInvoice))),
+																						_1: {ctor: '[]'}
+																					}),
+																				_1: {ctor: '[]'}
+																			}
+																		});
+																} else {
+																	return _elm_lang$html$Html$text('');
+																}
+															}(),
+															_1: {ctor: '[]'}
+														}
 													}
 												}),
 											_1: {
@@ -11867,16 +12015,8 @@ var _user$project$Views$invoiceView = function (_p23) {
 																_0: _elm_lang$html$Html$text(
 																	A2(
 																		_elm_lang$core$Basics_ops['++'],
-																		A2(_user$project$I18n$translate, _p27, _user$project$I18n$Total),
-																		A2(
-																			_elm_lang$core$Basics_ops['++'],
-																			': ',
-																			_user$project$InvoiceHelpers$toCurrency(
-																				{
-																					ctor: '_Tuple2',
-																					_0: _p25,
-																					_1: _user$project$InvoiceHelpers$total(_p26)
-																				})))),
+																		A2(_user$project$I18n$translate, language, _user$project$I18n$Total),
+																		A2(_elm_lang$core$Basics_ops['++'], ': ', totalInvoice))),
 																_1: {ctor: '[]'}
 															}),
 														_1: {ctor: '[]'}
@@ -11954,6 +12094,11 @@ var _user$project$Ports$saveLanguage = _elm_lang$core$Native_Platform.outgoingPo
 	'saveLanguage',
 	function (v) {
 		return v;
+	});
+var _user$project$Ports$saveDeduction = _elm_lang$core$Native_Platform.outgoingPort(
+	'saveDeduction',
+	function (v) {
+		return (v.ctor === 'Nothing') ? null : v._0;
 	});
 
 var _user$project$ContactDetails$decode = function (invoicer) {
@@ -12313,7 +12458,41 @@ var _user$project$App$update = F2(
 						_0: _elm_lang$core$Platform_Cmd$none,
 						_1: {ctor: '[]'}
 					});
-			default:
+			case 'ToggleDeductions':
+				var deduction = function () {
+					var _p9 = model.deduction;
+					if (_p9.ctor === 'Just') {
+						return _elm_lang$core$Maybe$Nothing;
+					} else {
+						return _elm_lang$core$Maybe$Just(0);
+					}
+				}();
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{deduction: deduction}),
+					{
+						ctor: '::',
+						_0: _user$project$Ports$saveDeduction(deduction),
+						_1: {ctor: '[]'}
+					});
+			case 'SetDeduction':
+				var _p10 = _p0._0;
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							deduction: _elm_lang$core$Maybe$Just(_p10)
+						}),
+					{
+						ctor: '::',
+						_0: _user$project$Ports$saveDeduction(
+							_elm_lang$core$Maybe$Just(_p10)),
+						_1: {ctor: '[]'}
+					});
+			case 'PrintPort':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					model,
@@ -12323,6 +12502,11 @@ var _user$project$App$update = F2(
 							{ctor: '_Tuple0'}),
 						_1: {ctor: '[]'}
 					});
+			default:
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					model,
+					{ctor: '[]'});
 		}
 	});
 var _user$project$App$model = {
@@ -12333,9 +12517,32 @@ var _user$project$App$model = {
 	datePicker: _user$project$DatePickerHelpers$newDatePicker(_elm_lang$core$Maybe$Nothing),
 	currentLine: _user$project$InvoiceHelpers$newEmptyLine,
 	currency: _user$project$Types$EUR,
-	language: _user$project$I18n$EN
+	language: _user$project$I18n$EN,
+	deduction: _elm_lang$core$Maybe$Nothing
 };
 var _user$project$App$init = function (flags) {
+	var updateDeduction = A2(
+		_elm_lang$core$Task$attempt,
+		function (result) {
+			var _p11 = result;
+			if (_p11.ctor === 'Ok') {
+				return _user$project$Types$SetDeduction(_p11._0);
+			} else {
+				return _user$project$Types$NoOp;
+			}
+		},
+		function () {
+			var _p12 = flags.deduction;
+			if (_p12.ctor === 'Just') {
+				return _elm_lang$core$Task$succeed(
+					A2(
+						_elm_lang$core$Result$withDefault,
+						0,
+						_elm_lang$core$String$toFloat(_p12._0)));
+			} else {
+				return _elm_lang$core$Task$fail('not stored deduction');
+			}
+		}());
 	var updateInvoicer = A2(
 		_elm_lang$core$Task$perform,
 		_user$project$Types$UpdateInvoicer,
@@ -12379,7 +12586,11 @@ var _user$project$App$init = function (flags) {
 					_1: {
 						ctor: '::',
 						_0: updateInvoicer,
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: updateDeduction,
+							_1: {ctor: '[]'}
+						}
 					}
 				}
 			}
@@ -12397,16 +12608,33 @@ var _user$project$App$main = _elm_lang$html$Html$programWithFlags(
 		function (currency) {
 			return A2(
 				_elm_lang$core$Json_Decode$andThen,
-				function (invoicer) {
+				function (deduction) {
 					return A2(
 						_elm_lang$core$Json_Decode$andThen,
-						function (language) {
-							return _elm_lang$core$Json_Decode$succeed(
-								{currency: currency, invoicer: invoicer, language: language});
+						function (invoicer) {
+							return A2(
+								_elm_lang$core$Json_Decode$andThen,
+								function (language) {
+									return _elm_lang$core$Json_Decode$succeed(
+										{currency: currency, deduction: deduction, invoicer: invoicer, language: language});
+								},
+								A2(
+									_elm_lang$core$Json_Decode$field,
+									'language',
+									_elm_lang$core$Json_Decode$oneOf(
+										{
+											ctor: '::',
+											_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Maybe$Nothing),
+											_1: {
+												ctor: '::',
+												_0: A2(_elm_lang$core$Json_Decode$map, _elm_lang$core$Maybe$Just, _elm_lang$core$Json_Decode$string),
+												_1: {ctor: '[]'}
+											}
+										})));
 						},
 						A2(
 							_elm_lang$core$Json_Decode$field,
-							'language',
+							'invoicer',
 							_elm_lang$core$Json_Decode$oneOf(
 								{
 									ctor: '::',
@@ -12420,7 +12648,7 @@ var _user$project$App$main = _elm_lang$html$Html$programWithFlags(
 				},
 				A2(
 					_elm_lang$core$Json_Decode$field,
-					'invoicer',
+					'deduction',
 					_elm_lang$core$Json_Decode$oneOf(
 						{
 							ctor: '::',
