@@ -7,12 +7,18 @@
   },
   "scripts": {
     "test": "elm-test",
-    "start": "elm-live src/App.elm --output=elm.js --open --pushstate --debug",
-    "build": "elm-make src/App.elm --output elm.js"
+    "start": "webpack-dev-server",
+    "build": "webpack -p"
   },
   "author": "Gabriel Perales",
   "license": "ISC",
+  "dependencies": {
+    "dotenv": "^4.0.0",
+    "elm": "^0.18.0",
+    "elm-webpack-loader": "^4.3.0",
+    "webpack": "^2.4.1"
+  },
   "devDependencies": {
-    "elm-live": "^2.7.4"
+    "webpack-dev-server": "^2.4.2"
   }
 }
