@@ -16,6 +16,8 @@
     "dotenv": "^4.0.0",
     "elm": "^0.18.0",
     "elm-webpack-loader": "^4.3.0",
+    "expose-loader": "^0.7.3",
+    "pouchdb": "^6.1.2",
     "webpack": "^2.4.1"
   },
   "devDependencies": {

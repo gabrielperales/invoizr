@@ -137,7 +137,7 @@ taxes =
     List.map taxesLine >> List.foldr (+) 0
 
 
-deductions : Deduction -> InvoiceLines -> Float
+deductions : Maybe Deduction -> InvoiceLines -> Float
 deductions deduction invoicelines =
     (subtotal invoicelines) * ((Maybe.withDefault 0.0 deduction) / 100)
 
