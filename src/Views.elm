@@ -5,17 +5,18 @@ import Html.Attributes exposing (type_, checked, name, placeholder, value, actio
 import Html.Events exposing (onSubmit, onInput, onClick, onDoubleClick)
 import Types exposing (ContactDetails, InvoiceLines, Line, Deduction, Msg(..), Currency(..), Model)
 import InvoiceHelpers exposing (currencySymb, toCurrency, subtotalLine, subtotal, taxes, deductions, total)
-import Date
 import DatePicker
-import Helpers exposing (toFixed)
 import I18n exposing (translate, TranslationId(..), Language(..))
 
 
-toolbar : Deduction -> Language -> Html Msg
-toolbar deduction language =
+toolbar : Model -> Html Msg
+toolbar model =
     let
+        { language, invoice } =
+            model
+
         isChecked =
-            case deduction of
+            case invoice.deduction of
                 Just _ ->
                     True
 
@@ -32,6 +33,8 @@ toolbar deduction language =
             , button [ onClick <| SetCurrency GBP ] [ text "£" ]
             , text "|"
             , button [ onClick <| SetCurrency USD ] [ text "$" ]
+            , text "|"
+            , button [ onClick <| SavePort invoice ] [ text <| translate language Save ]
             , text "|"
             , button [ onClick PrintPort ] [ text <| translate language Print ]
             , text "|"
@@ -241,29 +244,32 @@ invoiceLinesView language invoiceLines =
 invoiceView : Model -> Html Msg
 invoiceView model =
     let
-        { invoicer, customer, invoice, currentLine, currency, language, datePicker } =
+        { invoice, currentLine, currency, language, datePicker } =
             model
 
+        { invoicer, customer, invoicelines } =
+            invoice
+
         inputText val =
-            input [ class "b-none col-12 d-block h4 m-tb-1em", type_ "text", value val ] []
+            input [ class "b-none col-12 col-sm-12 d-block h4 m-tb-1em", type_ "text", value val ] []
 
         deduction =
-            deductions model.deduction invoice
+            deductions invoice.deduction invoicelines
 
         subtotalInvoice =
-            toCurrency ( currency, subtotal invoice )
+            toCurrency ( currency, subtotal invoicelines )
 
         taxesInvoice =
-            toCurrency ( currency, taxes invoice )
+            toCurrency ( currency, taxes invoicelines )
 
         deductionInvoice =
             toCurrency ( currency, deduction )
 
         totalInvoice =
-            toCurrency ( currency, (total invoice) - deduction )
+            toCurrency ( currency, (total invoicelines) - deduction )
     in
         div [ class "wrapper" ]
-            [ toolbar model.deduction language
+            [ toolbar model
             , div [ id "invoice" ]
                 [ invoiceHeader language invoicer
                 , div [ class "row p-lr-3em p-tb-1-5em" ]
@@ -286,14 +292,14 @@ invoiceView model =
                 , div [ class "p-lr-3em p-b-1em" ]
                     [ div [ class "h5" ]
                         [ p [ class "h3" ] [ text <| translate language ProjectBreakdown ]
-                        , invoiceLinesView language invoice
+                        , invoiceLinesView language invoicelines
                         ]
                     ]
                 , div [ class "p-lr-3em p-b-1em no-print" ] [ addLineView language currency currentLine ]
                 , div [ class "p-lr-3em" ]
                     [ p [ class "ta-right p" ] [ text <| (translate language Subtotal) ++ ": " ++ subtotalInvoice ]
                     , p [ class "ta-right p" ] [ text <| (translate language Taxes) ++ ": " ++ taxesInvoice ]
-                    , case model.deduction of
+                    , case invoice.deduction of
                         Just percentage ->
                             div [ class "ta-right p" ]
                                 [ label [ class "no-print" ]

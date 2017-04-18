@@ -6,15 +6,11 @@ import DatePicker exposing (DatePicker)
 
 
 type alias Model =
-    { invoicer : ContactDetails
-    , customer : ContactDetails
-    , invoice : Invoice
-    , date : Maybe Date
+    { invoice : Invoice
     , datePicker : DatePicker
     , currentLine : Line
     , currency : Currency
     , language : Language
-    , deduction : Deduction
     }
 
 
@@ -27,7 +23,7 @@ type alias Flags =
 
 
 type alias Deduction =
-    Maybe Float
+    Float
 
 
 type Currency
@@ -74,7 +70,14 @@ type alias InvoiceLines =
 
 
 type alias Invoice =
-    InvoiceLines
+    { id : Maybe String
+    , rev : Maybe String
+    , invoicer : ContactDetails
+    , customer : ContactDetails
+    , invoicelines : InvoiceLines
+    , date : Maybe Date
+    , deduction : Maybe Deduction
+    }
 
 
 
@@ -94,5 +97,6 @@ type Msg
     | SetDate Date
     | ToggleDeductions
     | SetDeduction Float
+    | SavePort Invoice
     | PrintPort
     | NoOp

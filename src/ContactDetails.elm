@@ -1,11 +1,11 @@
 module ContactDetails exposing (..)
 
-import Json.Encode as Encode
+import Json.Encode as Encode exposing (Value)
 import Json.Decode as Decode exposing (field)
 import Types exposing (ContactDetails, Address)
 
 
-encode : ContactDetails -> String
+encode : ContactDetails -> Value
 encode details =
     let
         string =
@@ -27,7 +27,6 @@ encode details =
                     ]
               )
             ]
-            |> Encode.encode 0
 
 
 decode : String -> Result String ContactDetails
