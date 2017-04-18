@@ -251,7 +251,7 @@ invoiceView model =
             invoice
 
         inputText val =
-            input [ class "b-none col-12 d-block h4 m-tb-1em", type_ "text", value val ] []
+            input [ class "b-none col-12 col-sm-12 d-block h4 m-tb-1em", type_ "text", value val ] []
 
         deduction =
             deductions invoice.deduction invoicelines
