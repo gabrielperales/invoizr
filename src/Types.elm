@@ -70,7 +70,9 @@ type alias InvoiceLines =
 
 
 type alias Invoice =
-    { invoicer : ContactDetails
+    { id : Maybe String
+    , rev : Maybe String
+    , invoicer : ContactDetails
     , customer : ContactDetails
     , invoicelines : InvoiceLines
     , date : Maybe Date
@@ -95,5 +97,6 @@ type Msg
     | SetDate Date
     | ToggleDeductions
     | SetDeduction Float
+    | SavePort Invoice
     | PrintPort
     | NoOp

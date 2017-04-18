@@ -37,8 +37,8 @@ app.ports.saveDeduction.subscribe(function(deduction){
 app.ports.createInvoice.subscribe(function(invoice){
   db.post(invoice)
     .then(function(invoice){
-        app.ports.invoice.send(invoice);
-    });
+      app.ports.invoice.send(invoice);
+    })
 });
 
 app.ports.saveInvoice.subscribe(function(invoice){

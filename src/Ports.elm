@@ -1,6 +1,6 @@
 port module Ports exposing (..)
 
-import Json.Encode
+import Json.Encode exposing (Value)
 
 
 port print : () -> Cmd msg
@@ -18,10 +18,10 @@ port saveLanguage : String -> Cmd msg
 port saveDeduction : Maybe Float -> Cmd msg
 
 
-port createInvoice : () -> Cmd msg
+port createInvoice : Value -> Cmd msg
 
 
-port saveInvoice : () -> Cmd msg
+port saveInvoice : Value -> Cmd msg
 
 
 port deleteInvoice : String -> Cmd msg

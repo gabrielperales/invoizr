@@ -5,17 +5,18 @@ import Html.Attributes exposing (type_, checked, name, placeholder, value, actio
 import Html.Events exposing (onSubmit, onInput, onClick, onDoubleClick)
 import Types exposing (ContactDetails, InvoiceLines, Line, Deduction, Msg(..), Currency(..), Model)
 import InvoiceHelpers exposing (currencySymb, toCurrency, subtotalLine, subtotal, taxes, deductions, total)
-import Date
 import DatePicker
-import Helpers exposing (toFixed)
 import I18n exposing (translate, TranslationId(..), Language(..))
 
 
-toolbar : Maybe Deduction -> Language -> Html Msg
-toolbar deduction language =
+toolbar : Model -> Html Msg
+toolbar model =
     let
+        { language, invoice } =
+            model
+
         isChecked =
-            case deduction of
+            case invoice.deduction of
                 Just _ ->
                     True
 
@@ -32,6 +33,8 @@ toolbar deduction language =
             , button [ onClick <| SetCurrency GBP ] [ text "£" ]
             , text "|"
             , button [ onClick <| SetCurrency USD ] [ text "$" ]
+            , text "|"
+            , button [ onClick <| SavePort invoice ] [ text <| translate language Save ]
             , text "|"
             , button [ onClick PrintPort ] [ text <| translate language Print ]
             , text "|"
@@ -266,7 +269,7 @@ invoiceView model =
             toCurrency ( currency, (total invoicelines) - deduction )
     in
         div [ class "wrapper" ]
-            [ toolbar invoice.deduction language
+            [ toolbar model
             , div [ id "invoice" ]
                 [ invoiceHeader language invoicer
                 , div [ class "row p-lr-3em p-tb-1-5em" ]

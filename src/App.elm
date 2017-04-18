@@ -7,16 +7,20 @@ import InvoiceHelpers exposing (exampleContact, newContact, newEmptyLine, string
 import Ports exposing (..)
 import I18n exposing (Language(..))
 import ContactDetails
+import Invoice
 import Date
 import DatePicker
 import DatePickerHelpers exposing (..)
 import Task exposing (Task)
+import Json.Encode as Encode
 
 
 model : Model
 model =
     { invoice =
-        { invoicelines = []
+        { id = Nothing
+        , rev = Nothing
+        , invoicelines = []
         , invoicer = exampleContact
         , customer = newContact
         , date = Nothing
@@ -43,7 +47,11 @@ update msg model =
                 { model | currentLine = line } ! [ Cmd.none ]
 
             UpdateInvoicer invoicer ->
-                { model | invoice = { invoice | invoicer = invoicer } } ! [ saveInvoicerDetails <| ContactDetails.encode invoicer ]
+                { model | invoice = { invoice | invoicer = invoicer } }
+                    ! [ ContactDetails.encode invoicer
+                            |> Encode.encode 0
+                            |> saveInvoicerDetails
+                      ]
 
             ToggleEditLine index ->
                 let
@@ -113,6 +121,9 @@ update msg model =
 
             SetDeduction deduction ->
                 { model | invoice = { invoice | deduction = Just deduction } } ! [ saveDeduction <| Just deduction ]
+
+            SavePort invoice ->
+                model ! [ invoice |> Invoice.encode |> createInvoice ]
 
             PrintPort ->
                 model ! [ print () ]
