@@ -1,7 +1,7 @@
 module ContactDetails exposing (..)
 
 import Json.Encode as Encode exposing (Value)
-import Json.Decode as Decode exposing (field)
+import Json.Decode as Decode exposing (Decoder, field)
 import Types exposing (ContactDetails, Address)
 
 
@@ -29,27 +29,30 @@ encode details =
             ]
 
 
-decode : String -> Result String ContactDetails
-decode invoicer =
+decoder : Decoder ContactDetails
+decoder =
     let
         string =
             Decode.string
     in
-        Decode.decodeString
-            (Decode.map6 ContactDetails
-                (field "name" string)
-                (field "taxes_id" string)
-                (field "phone" string)
-                (field "email" string)
-                (field "website" string)
-                (field "address"
-                    (Decode.map5 Address
-                        (field "street" string)
-                        (field "city" string)
-                        (field "state" string)
-                        (field "country" string)
-                        (field "zip" string)
-                    )
+        (Decode.map6 ContactDetails
+            (field "name" string)
+            (field "taxes_id" string)
+            (field "phone" string)
+            (field "email" string)
+            (field "website" string)
+            (field "address"
+                (Decode.map5 Address
+                    (field "street" string)
+                    (field "city" string)
+                    (field "state" string)
+                    (field "country" string)
+                    (field "zip" string)
                 )
             )
-            invoicer
+        )
+
+
+decode : String -> Result String ContactDetails
+decode invoicer =
+    Decode.decodeString decoder invoicer

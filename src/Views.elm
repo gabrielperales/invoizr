@@ -12,8 +12,13 @@ import I18n exposing (translate, TranslationId(..), Language(..))
 toolbar : Model -> Html Msg
 toolbar model =
     let
-        { language, invoice } =
+        { language, invoice, invoices } =
             model
+
+        options =
+            invoices
+                |> List.map (\invoice -> option [] [ text <| Maybe.withDefault "Not valid date" <| Maybe.map toString invoice.date ])
+                |> (::) (option [] [ text "..." ])
 
         isChecked =
             case invoice.deduction of
@@ -35,6 +40,11 @@ toolbar model =
             , button [ onClick <| SetCurrency USD ] [ text "$" ]
             , text "|"
             , button [ onClick <| SavePort invoice ] [ text <| translate language Save ]
+            , text "|"
+            , label [ class "p" ]
+                [ text <| translate language Load
+                , select [ class "d-inline-block" ] options
+                ]
             , text "|"
             , button [ onClick PrintPort ] [ text <| translate language Print ]
             , text "|"

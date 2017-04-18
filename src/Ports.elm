@@ -1,6 +1,6 @@
 port module Ports exposing (..)
 
-import Json.Encode exposing (Value)
+import Json.Decode exposing (Value)
 
 
 port print : () -> Cmd msg
@@ -33,7 +33,7 @@ port getInvoice : String -> Cmd msg
 port getInvoices : () -> Cmd msg
 
 
-port invoice : (Json.Encode.Value -> msg) -> Sub msg
+port invoice : (Value -> msg) -> Sub msg
 
 
-port invoices : (Json.Encode.Value -> msg) -> Sub msg
+port invoices : (Value -> msg) -> Sub msg

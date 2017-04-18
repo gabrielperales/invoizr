@@ -1,8 +1,10 @@
 module Invoice exposing (..)
 
 import Json.Encode as Encode exposing (Value)
-import Types exposing (Invoice)
+import Json.Decode as Decode exposing (Decoder, field)
+import Types exposing (Invoice, Line, Product)
 import ContactDetails
+import Helpers exposing (decodeDate)
 import Date
 
 
@@ -44,7 +46,7 @@ encode invoice =
             , ( "date"
               , case invoice.date of
                     Just date ->
-                        float <| Date.toTime date
+                        string <| toString date
 
                     _ ->
                         Encode.null
@@ -58,3 +60,48 @@ encode invoice =
                         Encode.null
               )
             ]
+
+
+decoder : Decoder Invoice
+decoder =
+    let
+        string =
+            Decode.string
+
+        float =
+            Decode.float
+
+        nullable =
+            Decode.nullable
+
+        contactDetails =
+            ContactDetails.decoder
+    in
+        (Decode.map7 Invoice
+            (field "_id" (nullable string))
+            (field "_rev" (nullable string))
+            (field "invoicer" contactDetails)
+            (field "customer" contactDetails)
+            (field "invoicelines"
+                (Decode.list
+                    (Decode.map3 Line
+                        (field "product"
+                            (Decode.map3 Product
+                                (field "name" string)
+                                (field "price" float)
+                                (field "taxes" float)
+                            )
+                        )
+                        (field "quantity" float)
+                        (field "editing" Decode.bool)
+                    )
+                )
+            )
+            (field "date" (nullable decodeDate))
+            (field "deduction" (nullable float))
+        )
+
+
+decode : String -> Result String Invoice
+decode invoice =
+    Decode.decodeString decoder invoice

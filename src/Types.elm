@@ -11,6 +11,7 @@ type alias Model =
     , currentLine : Line
     , currency : Currency
     , language : Language
+    , invoices : List Invoice
     }
 
 
@@ -99,4 +100,6 @@ type Msg
     | SetDeduction Float
     | SavePort Invoice
     | PrintPort
+    | GetInvoicesPort
+    | SetInvoices (List Invoice)
     | NoOp

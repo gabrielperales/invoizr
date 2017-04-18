@@ -10,6 +10,14 @@ var app = Elm.App.fullscreen({
   deduction: localStorage.getItem('deduction'),
 });
 
+var reloadInvoiceList = function(){
+  db.allDocs({'include_docs': true})
+    .then(function(response){
+      var invoices = response.rows.map(function(row){ return row.doc; });
+      app.ports.invoices.send(invoices);
+    });
+};
+
 app.ports.print.subscribe(function(){
   window.print();
 });
@@ -38,7 +46,8 @@ app.ports.createInvoice.subscribe(function(invoice){
   db.post(invoice)
     .then(function(invoice){
       app.ports.invoice.send(invoice);
-    })
+      reloadInvoiceList();
+    });
 });
 
 app.ports.saveInvoice.subscribe(function(invoice){
@@ -49,10 +58,7 @@ app.ports.saveInvoice.subscribe(function(invoice){
 });
 
 app.ports.getInvoices.subscribe(function(){
-  db.allDocs()
-    .then(function(invoices){
-      app.ports.invoices.send(invoices);
-    });
+  reloadInvoiceList();
 });
 
 app.ports.getInvoice.subscribe(function(invoiceId){

@@ -13,6 +13,7 @@ import DatePicker
 import DatePickerHelpers exposing (..)
 import Task exposing (Task)
 import Json.Encode as Encode
+import Json.Decode as Decode
 
 
 model : Model
@@ -30,6 +31,7 @@ model =
     , currentLine = newEmptyLine
     , currency = EUR
     , language = EN
+    , invoices = []
     }
 
 
@@ -128,6 +130,12 @@ update msg model =
             PrintPort ->
                 model ! [ print () ]
 
+            GetInvoicesPort ->
+                model ! [ getInvoices () ]
+
+            SetInvoices invoices ->
+                { model | invoices = invoices } ! []
+
             NoOp ->
                 model ! []
 
@@ -137,6 +145,9 @@ init flags =
     let
         updateDate =
             Task.perform SetDate Date.now
+
+        getInvoices =
+            Task.perform (always GetInvoicesPort) (Task.succeed ())
 
         updateCurrency =
             flags.currency
@@ -180,7 +191,25 @@ init flags =
                                 NoOp
                     )
     in
-        model ! [ updateDate, updateCurrency, updateLanguage, updateInvoicer, updateDeduction ]
+        model ! [ updateDate, updateCurrency, updateLanguage, updateInvoicer, updateDeduction, getInvoices ]
+
+
+subcriptions : Model -> Sub Msg
+subcriptions model =
+    Sub.batch
+        [ invoices
+            (\invoicesValue ->
+                Decode.decodeValue (Decode.list Invoice.decoder) invoicesValue
+                    |> (\result ->
+                            case result of
+                                Ok inv ->
+                                    SetInvoices inv
+
+                                Err _ ->
+                                    SetInvoices []
+                       )
+            )
+        ]
 
 
 main : Program Flags Model Msg
@@ -188,6 +217,6 @@ main =
     programWithFlags
         { init = init
         , view = invoiceView
-        , subscriptions = always Sub.none
+        , subscriptions = subcriptions
         , update = update
         }
