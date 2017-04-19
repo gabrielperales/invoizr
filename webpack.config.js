@@ -1,6 +1,7 @@
 require('dotenv').config();
 const path = require('path');
 const webpack = require('webpack');
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = {
   entry: './src/main.js',
@@ -20,5 +21,8 @@ module.exports = {
     }],
   },
   plugins: [
+    new CopyWebpackPlugin([
+      { from: './src/service-worker.js', to: './service-worker.js'},
+    ])
   ],
 };
