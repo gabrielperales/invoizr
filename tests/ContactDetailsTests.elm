@@ -5,6 +5,7 @@ import Test exposing (..)
 import Expect
 import InvoiceHelpers exposing (exampleContact)
 import Fixtures exposing (contactDetails)
+import Json.Encode as Encode
 
 
 all : Test
@@ -20,6 +21,10 @@ all =
                         blanks =
                             \c -> not ((c == ' ') || (c == '\n'))
                     in
-                        Expect.equal (String.filter blanks contactDetails) (String.filter blanks <| encode exampleContact)
+                        Expect.equal (String.filter blanks contactDetails)
+                            (encode exampleContact
+                                |> Encode.encode 0
+                                |> String.filter blanks
+                            )
             ]
         ]
