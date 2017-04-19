@@ -20,6 +20,7 @@ type TranslationId
     | Quantity
     | Amount
     | Save
+    | Load
     | Delete
     | Subtotal
     | Total
@@ -92,6 +93,9 @@ translate language id =
 
                 Save ->
                     "Save"
+
+                Load ->
+                    "Load"
 
                 Delete ->
                     "Delete"
@@ -169,6 +173,9 @@ translate language id =
 
                 Save ->
                     "Actualizar"
+
+                Load ->
+                    "Cargar"
 
                 Delete ->
                     "Borrar"

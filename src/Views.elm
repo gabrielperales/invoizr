@@ -6,14 +6,23 @@ import Html.Events exposing (onSubmit, onInput, onClick, onDoubleClick)
 import Types exposing (ContactDetails, InvoiceLines, Line, Deduction, Msg(..), Currency(..), Model)
 import InvoiceHelpers exposing (currencySymb, toCurrency, subtotalLine, subtotal, taxes, deductions, total)
 import DatePicker
+import Array
 import I18n exposing (translate, TranslationId(..), Language(..))
 
 
 toolbar : Model -> Html Msg
 toolbar model =
     let
-        { language, invoice } =
+        { language, invoice, invoices } =
             model
+
+        invoicesArr =
+            Array.fromList invoices
+
+        options =
+            invoices
+                |> List.indexedMap (\index invoice -> option [ value <| toString index ] [ text <| Maybe.withDefault "Not valid date" <| Maybe.map toString invoice.date ])
+                |> (::) (option [] [ text "..." ])
 
         isChecked =
             case invoice.deduction of
@@ -22,6 +31,13 @@ toolbar model =
 
                 _ ->
                     False
+
+        selectHandler index =
+            index
+                |> String.toInt
+                |> Result.withDefault 0
+                |> flip Array.get invoicesArr
+                |> SetInvoice
     in
         div [ class "no-print m-tb-1em" ]
             [ button [ onClick <| SetLanguage EN ] [ text <| translate language English ]
@@ -35,6 +51,11 @@ toolbar model =
             , button [ onClick <| SetCurrency USD ] [ text "$" ]
             , text "|"
             , button [ onClick <| SavePort invoice ] [ text <| translate language Save ]
+            , text "|"
+            , label [ class "p" ]
+                [ text <| translate language Load
+                , select [ class "d-inline-block", onInput selectHandler ] options
+                ]
             , text "|"
             , button [ onClick PrintPort ] [ text <| translate language Print ]
             , text "|"
@@ -79,24 +100,27 @@ invoiceHeader language invoicer =
 
 
 contactInfoView : Language -> ContactDetails -> Html Msg
-contactInfoView language { name, taxes_id, address } =
+contactInfoView language customer =
     let
-        inputText pholder val =
-            input [ class "b-none m-b-0-5em", type_ "text", placeholder pholder, value val ] []
+        { name, taxes_id, address } =
+            customer
+
+        inputText pholder val change =
+            input [ class "b-none m-b-0-5em", type_ "text", placeholder pholder, value val, onInput change ] []
     in
         div []
             [ p [ class "m-b-0-5em" ]
                 [ text <| (translate language Name) ++ " :"
-                , inputText (translate language Name) name
+                , inputText (translate language Name) name <| \value -> UpdateCustomer { customer | name = value }
                 ]
             , p [ class "m-b-0-5em" ]
                 [ text <| (translate language TaxId) ++ ": "
-                , inputText (translate language TaxId) taxes_id
+                , inputText (translate language TaxId) taxes_id <| \value -> UpdateCustomer { customer | taxes_id = value }
                 ]
             , p [ class "m-b-0-5em" ] [ text <| (translate language Address) ++ ": " ]
             , div [ class "p-lr-1em" ]
                 ([ ( address.street, Street ), ( address.city, City ), ( address.zip, ZipCode ) ]
-                    |> List.map (\( value, translateId ) -> inputText (translate language translateId) value)
+                    |> List.map (\( field, translateId ) -> inputText (translate language translateId) field <| \v -> UpdateCustomer customer)
                     |> List.intersperse (br [] [])
                 )
             ]

@@ -11,6 +11,7 @@ type alias Model =
     , currentLine : Line
     , currency : Currency
     , language : Language
+    , invoices : List Invoice
     }
 
 
@@ -91,6 +92,7 @@ type Msg
     | DeleteLine Int
     | UpdateCurrentLine Line
     | UpdateInvoicer ContactDetails
+    | UpdateCustomer ContactDetails
     | SetLanguage Language
     | SetCurrency Currency
     | ToDatePicker DatePicker.Msg
@@ -99,4 +101,7 @@ type Msg
     | SetDeduction Float
     | SavePort Invoice
     | PrintPort
+    | GetInvoicesPort
+    | SetInvoices (List Invoice)
+    | SetInvoice (Maybe Invoice)
     | NoOp

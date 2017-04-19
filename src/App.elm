@@ -13,6 +13,7 @@ import DatePicker
 import DatePickerHelpers exposing (..)
 import Task exposing (Task)
 import Json.Encode as Encode
+import Json.Decode as Decode
 
 
 model : Model
@@ -30,6 +31,7 @@ model =
     , currentLine = newEmptyLine
     , currency = EUR
     , language = EN
+    , invoices = []
     }
 
 
@@ -44,7 +46,7 @@ update msg model =
                 { model | invoice = { invoice | invoicelines = line :: invoice.invoicelines }, currentLine = newEmptyLine } ! [ Cmd.none ]
 
             UpdateCurrentLine line ->
-                { model | currentLine = line } ! [ Cmd.none ]
+                { model | currentLine = line } ! []
 
             UpdateInvoicer invoicer ->
                 { model | invoice = { invoice | invoicer = invoicer } }
@@ -52,6 +54,10 @@ update msg model =
                             |> Encode.encode 0
                             |> saveInvoicerDetails
                       ]
+
+            UpdateCustomer customer ->
+                { model | invoice = { invoice | customer = customer } }
+                    ! []
 
             ToggleEditLine index ->
                 let
@@ -128,6 +134,20 @@ update msg model =
             PrintPort ->
                 model ! [ print () ]
 
+            GetInvoicesPort ->
+                model ! [ getInvoices () ]
+
+            SetInvoices invoices ->
+                { model | invoices = invoices } ! []
+
+            SetInvoice maybeInvoice ->
+                case maybeInvoice of
+                    Just invoice ->
+                        { model | invoice = invoice } ! []
+
+                    Nothing ->
+                        model ! []
+
             NoOp ->
                 model ! []
 
@@ -137,6 +157,9 @@ init flags =
     let
         updateDate =
             Task.perform SetDate Date.now
+
+        getInvoices =
+            Task.perform (always GetInvoicesPort) (Task.succeed ())
 
         updateCurrency =
             flags.currency
@@ -180,7 +203,25 @@ init flags =
                                 NoOp
                     )
     in
-        model ! [ updateDate, updateCurrency, updateLanguage, updateInvoicer, updateDeduction ]
+        model ! [ updateDate, updateCurrency, updateLanguage, updateInvoicer, updateDeduction, getInvoices ]
+
+
+subcriptions : Model -> Sub Msg
+subcriptions model =
+    Sub.batch
+        [ invoices
+            (\invoicesValue ->
+                Decode.decodeValue (Decode.list Invoice.decoder) invoicesValue
+                    |> (\result ->
+                            case result of
+                                Ok inv ->
+                                    SetInvoices inv
+
+                                Err _ ->
+                                    SetInvoices []
+                       )
+            )
+        ]
 
 
 main : Program Flags Model Msg
@@ -188,6 +229,6 @@ main =
     programWithFlags
         { init = init
         , view = invoiceView
-        , subscriptions = always Sub.none
+        , subscriptions = subcriptions
         , update = update
         }

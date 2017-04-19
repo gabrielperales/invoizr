@@ -1,5 +1,8 @@
 module Helpers exposing (..)
 
+import Json.Decode as Decode exposing (Decoder, string, andThen)
+import Date exposing (Date)
+
 
 toFixed : Int -> Float -> String
 toFixed decimals number =
@@ -22,3 +25,17 @@ toFixed decimals number =
 
             _ ->
                 join [ "0", zpadding "" ]
+
+
+decodeDate : Decoder Date
+decodeDate =
+    string
+        |> andThen
+            (\str ->
+                case (Date.fromString str) of
+                    Ok date ->
+                        Decode.succeed date
+
+                    Err error ->
+                        Decode.fail error
+            )
