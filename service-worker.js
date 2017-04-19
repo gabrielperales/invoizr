@@ -37,7 +37,7 @@
 /* eslint-disable indent, no-unused-vars, no-multiple-empty-lines, max-nested-callbacks, space-before-function-paren, quotes, comma-spacing */
 'use strict';
 
-var precacheConfig = [];
+var precacheConfig = [["bundle.js","8cbcd1f1b50622fdab801ee2ca4d54bf"],["index.html","921f3d299fd2ae603c0564a86cc29a8e"],["style.css","62d4f6696de3be88fdebc3c895ca2d4e"]];
 var cacheName = 'sw-precache-v3-invoizr-' + (self.registration ? self.registration.scope : '');
 
 
