@@ -92,6 +92,7 @@ type Msg
     | DeleteLine Int
     | UpdateCurrentLine Line
     | UpdateInvoicer ContactDetails
+    | UpdateCustomer ContactDetails
     | SetLanguage Language
     | SetCurrency Currency
     | ToDatePicker DatePicker.Msg
@@ -102,4 +103,5 @@ type Msg
     | PrintPort
     | GetInvoicesPort
     | SetInvoices (List Invoice)
+    | SetInvoice (Maybe Invoice)
     | NoOp

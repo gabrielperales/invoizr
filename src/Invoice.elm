@@ -14,6 +14,9 @@ encode invoice =
         string =
             Encode.string
 
+        bool =
+            Encode.bool
+
         list =
             Encode.list
 
@@ -22,43 +25,35 @@ encode invoice =
 
         contactDetails =
             ContactDetails.encode
+
+        null =
+            Maybe.withDefault Encode.null
     in
         Encode.object
-            [ ( "invoicer", contactDetails invoice.invoicer )
+            [ ( "id", null <| Maybe.map string invoice.id )
+            , ( "rev", null <| Maybe.map string invoice.rev )
+            , ( "invoicer", contactDetails invoice.invoicer )
             , ( "customer", contactDetails invoice.customer )
             , ( "invoicelines"
               , invoice.invoicelines
                     |> List.map
                         (\line ->
                             Encode.object
-                                [ ( "quantity", float line.quantity )
-                                , ( "product"
+                                [ ( "product"
                                   , Encode.object
                                         [ ( "name", string line.product.name )
                                         , ( "price", float line.product.price )
                                         , ( "taxes", float line.product.taxes )
                                         ]
                                   )
+                                , ( "quantity", float line.quantity )
+                                , ( "editing", bool line.editing )
                                 ]
                         )
                     |> list
               )
-            , ( "date"
-              , case invoice.date of
-                    Just date ->
-                        string <| toString date
-
-                    _ ->
-                        Encode.null
-              )
-            , ( "deduction"
-              , case invoice.deduction of
-                    Just deduction ->
-                        float deduction
-
-                    _ ->
-                        Encode.null
-              )
+            , ( "date", null <| Maybe.map (string << toString) <| invoice.date )
+            , ( "deduction", null <| Maybe.map float invoice.deduction )
             ]
 
 

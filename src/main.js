@@ -15,6 +15,7 @@ var reloadInvoiceList = function(){
     .then(function(response){
       var invoices = response.rows.map(function(row){ return row.doc; });
       app.ports.invoices.send(invoices);
+      debugger;
     });
 };
 

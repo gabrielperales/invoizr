@@ -46,7 +46,7 @@ update msg model =
                 { model | invoice = { invoice | invoicelines = line :: invoice.invoicelines }, currentLine = newEmptyLine } ! [ Cmd.none ]
 
             UpdateCurrentLine line ->
-                { model | currentLine = line } ! [ Cmd.none ]
+                { model | currentLine = line } ! []
 
             UpdateInvoicer invoicer ->
                 { model | invoice = { invoice | invoicer = invoicer } }
@@ -54,6 +54,10 @@ update msg model =
                             |> Encode.encode 0
                             |> saveInvoicerDetails
                       ]
+
+            UpdateCustomer customer ->
+                { model | invoice = { invoice | customer = customer } }
+                    ! []
 
             ToggleEditLine index ->
                 let
@@ -135,6 +139,14 @@ update msg model =
 
             SetInvoices invoices ->
                 { model | invoices = invoices } ! []
+
+            SetInvoice maybeInvoice ->
+                case maybeInvoice of
+                    Just invoice ->
+                        { model | invoice = invoice } ! []
+
+                    Nothing ->
+                        model ! []
 
             NoOp ->
                 model ! []
