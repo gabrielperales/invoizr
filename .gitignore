@@ -2,3 +2,5 @@ node_modules
 elm-stuff
 .DS_Store
 bundle.js
+service-worker.js
+
