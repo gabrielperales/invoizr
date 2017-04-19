@@ -10,6 +10,11 @@ var app = Elm.App.fullscreen({
   deduction: localStorage.getItem('deduction'),
 });
 
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker
+    .register('./service-worker.js');
+}
+
 var reloadInvoiceList = function(){
   db.allDocs({'include_docs': true})
     .then(function(response){
