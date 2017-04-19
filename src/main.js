@@ -12,7 +12,7 @@ var app = Elm.App.fullscreen({
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker
-    .register('./service-worker.js')
+    .register('./service-worker.js');
 }
 
 var reloadInvoiceList = function(){
