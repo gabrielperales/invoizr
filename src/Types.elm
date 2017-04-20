@@ -49,4 +49,5 @@ type Msg
     | GetInvoicesPort
     | SetInvoices (List Invoice)
     | SetInvoice (Maybe Invoice)
+    | DeleteInvoice Invoice
     | NoOp

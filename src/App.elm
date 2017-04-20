@@ -17,8 +17,8 @@ import Json.Encode as Encode
 import Json.Decode as Decode
 
 
-model : Model
-model =
+initialModel : Model
+initialModel =
     { invoice =
         { id = Nothing
         , rev = Nothing
@@ -149,6 +149,9 @@ update msg model =
                     Nothing ->
                         model ! []
 
+            DeleteInvoice invoice ->
+                { model | invoice = initialModel.invoice } ! [ invoice |> Invoice.encode |> deleteInvoice, Task.perform SetDate Date.now ]
+
             NoOp ->
                 model ! []
 
@@ -156,6 +159,9 @@ update msg model =
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
+        model =
+            initialModel
+
         updateDate =
             Task.perform SetDate Date.now
 

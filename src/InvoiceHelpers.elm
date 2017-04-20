@@ -1,10 +1,11 @@
 module InvoiceHelpers exposing (..)
 
-import Invoice exposing (InvoiceLines, Line, Product, Deduction, Currency(..))
+import Invoice exposing (Invoice, InvoiceLines, Line, Product, Deduction, Currency(..))
 import ContactDetails exposing (ContactDetails)
 import Address exposing (Address)
 import Helpers exposing (toFixed)
 import I18n exposing (Language(..))
+import Date
 
 
 currencySymb : Currency -> String
@@ -87,10 +88,14 @@ addLine =
 
 updateLineQuantity : Float -> Line -> Line
 updateLineQuantity cty line =
-    if (cty < 0) then
-        { line | quantity = 0 }
-    else
-        { line | quantity = cty }
+    let
+        quantity =
+            if (cty < 0) then
+                0
+            else
+                cty
+    in
+        { line | quantity = quantity }
 
 
 addQuantity : Float -> Line -> Line
@@ -146,3 +151,13 @@ deductions deduction invoicelines =
 total : InvoiceLines -> Float
 total =
     List.map totalLine >> List.foldr (+) 0
+
+
+sortByDate : Invoice -> Invoice -> Order
+sortByDate invoice1 invoice2 =
+    case ( invoice1.date, invoice2.date ) of
+        ( Just date1, Just date2 ) ->
+            flip compare (Date.toTime date1) (Date.toTime date2)
+
+        ( _, _ ) ->
+            LT
