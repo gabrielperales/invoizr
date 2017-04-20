@@ -2,10 +2,9 @@ module Invoice exposing (..)
 
 import Json.Encode as Encode exposing (Value)
 import Json.Decode as Decode exposing (Decoder, field)
-import Types exposing (Invoice, Line, Product)
-import ContactDetails
+import ContactDetails exposing (ContactDetails)
 import Helpers exposing (decodeDate)
-import Date
+import Date exposing (Date)
 
 
 encode : Invoice -> Value
@@ -100,3 +99,42 @@ decoder =
 decode : String -> Result String Invoice
 decode invoice =
     Decode.decodeString decoder invoice
+
+
+type alias Invoice =
+    { id : Maybe String
+    , rev : Maybe String
+    , invoicer : ContactDetails
+    , customer : ContactDetails
+    , invoicelines : InvoiceLines
+    , date : Maybe Date
+    , deduction : Maybe Deduction
+    }
+
+
+type alias Product =
+    { name : String
+    , price : Float
+    , taxes : Float
+    }
+
+
+type alias Line =
+    { product : Product
+    , quantity : Float
+    , editing : Bool
+    }
+
+
+type alias InvoiceLines =
+    List Line
+
+
+type alias Deduction =
+    Float
+
+
+type Currency
+    = EUR
+    | USD
+    | GBP

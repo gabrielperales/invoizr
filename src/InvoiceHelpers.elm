@@ -1,9 +1,10 @@
 module InvoiceHelpers exposing (..)
 
-import Types exposing (ContactDetails, InvoiceLines, Line, Product, Address, Currency(..), Deduction)
+import Invoice exposing (InvoiceLines, Line, Product, Deduction, Currency(..))
+import ContactDetails exposing (ContactDetails)
+import Address exposing (Address)
 import Helpers exposing (toFixed)
 import I18n exposing (Language(..))
-import Debug exposing (log)
 
 
 currencySymb : Currency -> String
