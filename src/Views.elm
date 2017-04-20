@@ -1,14 +1,15 @@
 module Views exposing (..)
 
 import Html exposing (..)
-import Html.Attributes exposing (type_, checked, name, placeholder, value, action, id, class, style)
+import Html.Attributes exposing (type_, checked, name, placeholder, value, action, id, class, style, disabled)
 import Html.Events exposing (onSubmit, onInput, onClick, onDoubleClick)
 import Invoice exposing (InvoiceLines, Line, Deduction, Currency(..))
 import Types exposing (Msg(..), Model)
 import ContactDetails exposing (Msg(..), ContactDetails)
 import Address exposing (Msg(..))
-import InvoiceHelpers exposing (currencySymb, toCurrency, subtotalLine, subtotal, taxes, deductions, total)
+import InvoiceHelpers exposing (currencySymb, toCurrency, subtotalLine, subtotal, taxes, deductions, total, sortByDate)
 import DatePicker
+import Date
 import Array
 import I18n exposing (translate, TranslationId(..), Language(..))
 
@@ -24,6 +25,7 @@ toolbar model =
 
         options =
             invoices
+                |> List.sortWith sortByDate
                 |> List.indexedMap (\index invoice -> option [ value <| toString index ] [ text <| Maybe.withDefault "Not valid date" <| Maybe.map toString invoice.date ])
                 |> (::) (option [] [ text "..." ])
 
@@ -34,6 +36,14 @@ toolbar model =
 
                 _ ->
                     False
+
+        isDisabled =
+            case invoice.id of
+                Just _ ->
+                    disabled False
+
+                _ ->
+                    disabled True
 
         selectHandler index =
             index
@@ -54,6 +64,8 @@ toolbar model =
             , button [ onClick <| SetCurrency USD ] [ text "$" ]
             , text "|"
             , button [ onClick <| SavePort invoice ] [ text <| translate language Save ]
+            , text "|"
+            , button [ isDisabled, onClick <| DeleteInvoice invoice ] [ text <| translate language Delete ]
             , text "|"
             , label [ class "p" ]
                 [ text <| translate language Load

@@ -29,8 +29,8 @@ encode invoice =
             Maybe.withDefault Encode.null
     in
         Encode.object
-            [ ( "id", null <| Maybe.map string invoice.id )
-            , ( "rev", null <| Maybe.map string invoice.rev )
+            [ ( "_id", null <| Maybe.map string invoice.id )
+            , ( "_rev", null <| Maybe.map string invoice.rev )
             , ( "invoicer", contactDetails invoice.invoicer )
             , ( "customer", contactDetails invoice.customer )
             , ( "invoicelines"

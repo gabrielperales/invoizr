@@ -74,5 +74,8 @@ app.ports.getInvoice.subscribe(function(invoiceId){
 });
 
 app.ports.deleteInvoice.subscribe(function(invoice){
-  db.remove(invoice);
+  db.remove(invoice)
+    .then(function(){
+      reloadInvoiceList();
+    });
 });

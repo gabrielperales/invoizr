@@ -24,7 +24,7 @@ port createInvoice : Value -> Cmd msg
 port saveInvoice : Value -> Cmd msg
 
 
-port deleteInvoice : String -> Cmd msg
+port deleteInvoice : Value -> Cmd msg
 
 
 port getInvoice : String -> Cmd msg
