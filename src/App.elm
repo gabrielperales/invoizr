@@ -1,6 +1,7 @@
 module App exposing (..)
 
-import Types exposing (Model, Flags, Line, Product, Msg(..), Currency(..))
+import Types exposing (Model, Flags, Msg(..))
+import Invoice exposing (Line, Product, Currency(..))
 import Html exposing (programWithFlags)
 import Views exposing (invoiceView)
 import InvoiceHelpers exposing (exampleContact, newContact, newEmptyLine, stringToCurrency, stringToLanguage)

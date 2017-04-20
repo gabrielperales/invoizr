@@ -3,14 +3,17 @@ module Views exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (type_, checked, name, placeholder, value, action, id, class, style)
 import Html.Events exposing (onSubmit, onInput, onClick, onDoubleClick)
-import Types exposing (ContactDetails, InvoiceLines, Line, Deduction, Msg(..), Currency(..), Model)
+import Invoice exposing (InvoiceLines, Line, Deduction, Currency(..))
+import Types exposing (Msg(..), Model)
+import ContactDetails exposing (Msg(..), ContactDetails)
+import Address exposing (Msg(..))
 import InvoiceHelpers exposing (currencySymb, toCurrency, subtotalLine, subtotal, taxes, deductions, total)
 import DatePicker
 import Array
 import I18n exposing (translate, TranslationId(..), Language(..))
 
 
-toolbar : Model -> Html Msg
+toolbar : Model -> Html Types.Msg
 toolbar model =
     let
         { language, invoice, invoices } =
@@ -66,7 +69,7 @@ toolbar model =
             ]
 
 
-invoiceHeader : Language -> ContactDetails -> Html Msg
+invoiceHeader : Language -> ContactDetails -> Html Types.Msg
 invoiceHeader language invoicer =
     let
         { name, taxes_id, phone, email, website, address } =
@@ -83,13 +86,13 @@ invoiceHeader language invoicer =
     in
         header [ class "row header p-tb-1-5em p-lr-3em" ]
             [ div [ class "col-4" ]
-                [ inputBigger name <| \value -> UpdateInvoicer { invoicer | name = value }
+                [ inputBigger name <| \value -> ContactDetails.updateName value invoicer |> UpdateInvoicer
                 , h1 [] [ text <| translate language Invoice ]
                 ]
             , div [ class "col-sm-6 col-4 ta-right" ]
-                [ inputDefault phone <| \value -> UpdateInvoicer { invoicer | phone = value }
-                , inputDefault email <| \value -> UpdateInvoicer { invoicer | email = value }
-                , inputDefault website <| \value -> UpdateInvoicer { invoicer | website = value }
+                [ inputDefault phone <| \value -> ContactDetails.updatePhone value invoicer |> UpdateInvoicer
+                , inputDefault email <| \value -> ContactDetails.updateEmail value invoicer |> UpdateInvoicer
+                , inputDefault website <| \value -> ContactDetails.updateWebsite value invoicer |> UpdateInvoicer
                 ]
             , div [ class "col-sm-6 col-4 ta-right" ]
                 [ inputDefault address.street <| \value -> UpdateInvoicer { invoicer | address = { address | street = value } }
@@ -99,7 +102,7 @@ invoiceHeader language invoicer =
             ]
 
 
-contactInfoView : Language -> ContactDetails -> Html Msg
+contactInfoView : Language -> ContactDetails -> Html Types.Msg
 contactInfoView language customer =
     let
         { name, taxes_id, address } =
@@ -110,23 +113,28 @@ contactInfoView language customer =
     in
         div []
             [ p [ class "m-b-0-5em" ]
-                [ text <| (translate language Name) ++ " :"
-                , inputText (translate language Name) name <| \value -> UpdateCustomer { customer | name = value }
+                [ text <| (translate language I18n.Name) ++ " :"
+                , inputText (translate language I18n.Name) name <| \value -> UpdateCustomer <| ContactDetails.update (ContactDetails.Name value) customer
                 ]
             , p [ class "m-b-0-5em" ]
-                [ text <| (translate language TaxId) ++ ": "
-                , inputText (translate language TaxId) taxes_id <| \value -> UpdateCustomer { customer | taxes_id = value }
+                [ text <| (translate language I18n.TaxId) ++ ": "
+                , inputText (translate language I18n.TaxId) taxes_id <| \value -> UpdateCustomer <| ContactDetails.update (ContactDetails.Taxes_id value) customer
                 ]
-            , p [ class "m-b-0-5em" ] [ text <| (translate language Address) ++ ": " ]
+            , p [ class "m-b-0-5em" ] [ text <| (translate language I18n.Address) ++ ": " ]
             , div [ class "p-lr-1em" ]
-                ([ ( address.street, Street ), ( address.city, City ), ( address.zip, ZipCode ) ]
-                    |> List.map (\( field, translateId ) -> inputText (translate language translateId) field <| \v -> UpdateCustomer customer)
+                ([ ( address.street, I18n.Street, Address.Street ), ( address.city, I18n.City, Address.City ), ( address.zip, I18n.ZipCode, Address.Zip ) ]
+                    |> List.map
+                        (\( value, translateId, msg ) ->
+                            inputText (translate language translateId) value <|
+                                \v ->
+                                    UpdateCustomer ({ customer | address = Address.update (msg v) customer.address })
+                        )
                     |> List.intersperse (br [] [])
                 )
             ]
 
 
-lineView : ( Int, Line ) -> Html Msg
+lineView : ( Int, Line ) -> Html Types.Msg
 lineView ( index, line ) =
     let
         { product, quantity } =
@@ -144,7 +152,7 @@ lineView ( index, line ) =
             ]
 
 
-editLineView : Language -> ( Int, Line ) -> Html Msg
+editLineView : Language -> ( Int, Line ) -> Html Types.Msg
 editLineView language ( index, line ) =
     let
         { product, quantity } =
@@ -186,7 +194,7 @@ editLineView language ( index, line ) =
             ]
 
 
-addLineView : Language -> Currency -> Line -> Html Msg
+addLineView : Language -> Currency -> Line -> Html Types.Msg
 addLineView language currency line =
     let
         { product } =
@@ -238,7 +246,7 @@ addLineView language currency line =
             ]
 
 
-invoiceLinesView : Language -> InvoiceLines -> Html Msg
+invoiceLinesView : Language -> InvoiceLines -> Html Types.Msg
 invoiceLinesView language invoiceLines =
     let
         tableHead =
@@ -265,7 +273,7 @@ invoiceLinesView language invoiceLines =
         table [ class "col-12 m-b-2em" ] invoiceTable
 
 
-invoiceView : Model -> Html Msg
+invoiceView : Model -> Html Types.Msg
 invoiceView model =
     let
         { invoice, currentLine, currency, language, datePicker } =
