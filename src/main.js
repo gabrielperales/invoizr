@@ -8,6 +8,7 @@ var app = Elm.App.fullscreen({
   currency: localStorage.getItem('currency'),
   language: localStorage.getItem('language'),
   deduction: localStorage.getItem('deduction'),
+  agreetments: localStorage.getItem('agreetments'),
 });
 
 if ('serviceWorker' in navigator) {
@@ -47,6 +48,14 @@ app.ports.saveDeduction.subscribe(function(deduction){
   }
 });
 
+app.ports.saveAgreetments.subscribe(function(agreetments){
+  if (agreetments !== null) {
+    localStorage.setItem('agreetments', agreetments);
+  } else {
+    localStorage.removeItem('agreetments');
+  }
+});
+
 app.ports.createInvoice.subscribe(function(invoice){
   db.post(invoice)
     .then(function(invoice){
@@ -79,3 +88,5 @@ app.ports.deleteInvoice.subscribe(function(invoice){
       reloadInvoiceList();
     });
 });
+
+

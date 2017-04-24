@@ -18,6 +18,9 @@ port saveLanguage : String -> Cmd msg
 port saveDeduction : Maybe Float -> Cmd msg
 
 
+port saveAgreetments : String -> Cmd msg
+
+
 port createInvoice : Value -> Cmd msg
 
 

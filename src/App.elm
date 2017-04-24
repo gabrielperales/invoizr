@@ -33,6 +33,9 @@ initialModel =
     , currency = EUR
     , language = EN
     , invoices = []
+    , agreetments =
+        """IMPORTANT: The above invoice may be paid by Bank Transfer.
+                      Payment is due within 30 days from the date of this invoice, late payment is subject to a fee of 5% per month."""
     }
 
 
@@ -127,7 +130,7 @@ update msg model =
                     { model | invoice = { invoice | deduction = deduction } } ! [ saveDeduction deduction ]
 
             SetDeduction deduction ->
-                { model | invoice = { invoice | deduction = Just deduction } } ! [ saveDeduction <| Just deduction ]
+                { model | invoice = { invoice | deduction = Just deduction } } ! [ Just deduction |> saveDeduction ]
 
             SavePort invoice ->
                 model ! [ invoice |> Invoice.encode |> createInvoice ]
@@ -151,6 +154,9 @@ update msg model =
 
             DeleteInvoice invoice ->
                 { model | invoice = initialModel.invoice } ! [ invoice |> Invoice.encode |> deleteInvoice, Task.perform SetDate Date.now ]
+
+            UpdateAgreetments agreetments ->
+                { model | agreetments = agreetments } ! [ agreetments |> saveAgreetments ]
 
             NoOp ->
                 model ! []
@@ -192,6 +198,12 @@ init flags =
                 |> Task.succeed
                 |> Task.perform UpdateInvoicer
 
+        updateAgreetments =
+            flags.agreetments
+                |> Maybe.withDefault model.agreetments
+                |> Task.succeed
+                |> Task.perform UpdateAgreetments
+
         updateDeduction =
             (case flags.deduction of
                 Just deduction ->
@@ -210,7 +222,7 @@ init flags =
                                 NoOp
                     )
     in
-        model ! [ updateDate, updateCurrency, updateLanguage, updateInvoicer, updateDeduction, getInvoices ]
+        model ! [ updateDate, updateCurrency, updateLanguage, updateInvoicer, updateDeduction, getInvoices, updateAgreetments ]
 
 
 subcriptions : Model -> Sub Msg

@@ -15,6 +15,7 @@ type alias Model =
     , currency : Currency
     , language : Language
     , invoices : List Invoice
+    , agreetments : String
     }
 
 
@@ -23,6 +24,7 @@ type alias Flags =
     , currency : Maybe String
     , language : Maybe String
     , deduction : Maybe String
+    , agreetments : Maybe String
     }
 
 
@@ -50,4 +52,5 @@ type Msg
     | SetInvoices (List Invoice)
     | SetInvoice (Maybe Invoice)
     | DeleteInvoice Invoice
+    | UpdateAgreetments String
     | NoOp
