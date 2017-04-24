@@ -4,6 +4,10 @@ html, body {
   font-family: 'Poppins', 'sans-serif';
 }
 
+textarea {
+  min-height: 100px;
+}
+
 .bc-transparent {
   background-color: transparent;
 }
@@ -78,6 +82,10 @@ html, body {
 
 .p-b-1em {
   padding-bottom: 1em;
+}
+
+.p-b-2em {
+  padding-bottom: 2em;
 }
 
 .p-lr-1em {
@@ -191,6 +199,10 @@ html, body {
   width: 100%;
 }
 
+.no-screen {
+  display: none !important;
+}
+
 @media print, (min-width: 600px) {
   .col-1 {
     width: 8.33%;
@@ -216,6 +228,10 @@ html, body {
 @media print {
   body {
     -webkit-print-color-adjust: exact;
+  }
+
+  .no-screen {
+    display: initial !important;
   }
 
   .no-print, .elm-overlay {

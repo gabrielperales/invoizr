@@ -1,7 +1,7 @@
 module Views exposing (..)
 
 import Html exposing (..)
-import Html.Attributes exposing (type_, checked, name, placeholder, value, action, id, class, style, disabled)
+import Html.Attributes exposing (type_, checked, name, placeholder, value, action, id, class, style, disabled, style)
 import Html.Events exposing (onSubmit, onInput, onClick, onDoubleClick)
 import Invoice exposing (InvoiceLines, Line, Deduction, Currency(..))
 import Types exposing (Msg(..), Model)
@@ -288,7 +288,7 @@ invoiceLinesView language invoiceLines =
 invoiceView : Model -> Html Types.Msg
 invoiceView model =
     let
-        { invoice, currentLine, currency, language, datePicker } =
+        { invoice, currentLine, currency, language, datePicker, agreetments } =
             model
 
         { invoicer, customer, invoicelines } =
@@ -349,6 +349,7 @@ invoiceView model =
                                 [ label [ class "no-print" ]
                                     [ text <| (translate language Deductions) ++ ": "
                                     , input [ class "ta-right", type_ "number", value (toString percentage), onInput (\val -> val |> String.toFloat |> Result.withDefault 0 |> SetDeduction) ] []
+                                    , text <| "%"
                                     ]
                                 , p [] [ text <| (translate language Deductions) ++ ": " ++ deductionInvoice ]
                                 ]
@@ -357,12 +358,18 @@ invoiceView model =
                             text ""
                     ]
                 , p [ class "p-lr-3em ta-right" ] [ strong [] [ text <| (translate language Total) ++ ": " ++ totalInvoice ] ]
-                , footer [ class "footer p-1em p-lr-3em" ]
-                    [ p [ class "h6 ta-justify" ]
-                        [ text
-                            """IMPORTANT: The above invoice may be paid by Bank Transfer.
-                      Payment is due within 30 days from the date of this invoice, late payment is subject to a fee of 5% per month."""
+                , div [ class "row p-lr-3em p-b-2em" ]
+                    [ p [] [ text "Agreetments:" ]
+                    , textarea
+                        [ value agreetments
+                        , onInput UpdateAgreetments
+                        , class "no-print col-12 col-sm-12"
                         ]
+                        []
+                    ]
+                , footer [ class "no-screen footer p-1em p-lr-3em" ]
+                    [ p [ class "h6 ta-justify" ]
+                        [ text agreetments ]
                     , p [ class "ta-center copyright h6" ] [ text "Gabriel Perales ® 2017" ]
                     ]
                 ]

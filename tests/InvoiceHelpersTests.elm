@@ -1,7 +1,7 @@
 module InvoiceHelpersTests exposing (..)
 
 import InvoiceHelpers exposing (..)
-import Types exposing (Product, Line, InvoiceLines)
+import Invoice exposing (Product, Line, InvoiceLines)
 import Test exposing (..)
 import Expect
 
