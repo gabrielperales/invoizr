@@ -349,6 +349,7 @@ invoiceView model =
                                 [ label [ class "no-print" ]
                                     [ text <| (translate language Deductions) ++ ": "
                                     , input [ class "ta-right", type_ "number", value (toString percentage), onInput (\val -> val |> String.toFloat |> Result.withDefault 0 |> SetDeduction) ] []
+                                    , text <| "%"
                                     ]
                                 , p [] [ text <| (translate language Deductions) ++ ": " ++ deductionInvoice ]
                                 ]
