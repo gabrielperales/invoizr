@@ -28,6 +28,7 @@ type TranslationId
     | English
     | Spanish
     | Deductions
+    | Agreetments
 
 
 type Language
@@ -118,6 +119,9 @@ translate language id =
                 Deductions ->
                     "Deductions"
 
+                Agreetments ->
+                    "Agreetment and payment details"
+
         ES ->
             case id of
                 Invoice ->
@@ -197,3 +201,6 @@ translate language id =
 
                 Deductions ->
                     "Retenciones"
+
+                Agreetments ->
+                    "Condiciones y detalles de pago"

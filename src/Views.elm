@@ -358,12 +358,12 @@ invoiceView model =
                             text ""
                     ]
                 , p [ class "p-lr-3em ta-right" ] [ strong [] [ text <| (translate language Total) ++ ": " ++ totalInvoice ] ]
-                , div [ class "row p-lr-3em p-b-2em" ]
-                    [ p [] [ text "Agreetments:" ]
+                , div [ class "no-print row p-lr-3em p-b-2em" ]
+                    [ p [] [ text <| (translate language Agreetments) ]
                     , textarea
                         [ value agreetments
                         , onInput UpdateAgreetments
-                        , class "no-print col-12 col-sm-12"
+                        , class "col-12 col-sm-12"
                         ]
                         []
                     ]
